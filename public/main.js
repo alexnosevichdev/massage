@@ -384,17 +384,6 @@
 
   // ─── Cancel section ─────────────────────────────────
 
-  // Show cancel section if URL has #cancel
-  if (window.location.hash === '#cancel') {
-    $('#cancel').hidden = false;
-  }
-
-  window.addEventListener('hashchange', () => {
-    if (window.location.hash === '#cancel') {
-      $('#cancel').hidden = false;
-    }
-  });
-
   cancelForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     cancelStatus.textContent = '';
