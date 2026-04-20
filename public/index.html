@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anna Sokolova — Massage Therapist</title>
+  <meta name="description" content="Professional therapeutic massage by Anna Sokolova. 12 years of experience. Book your session online.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- ─── NAV ──────────────────────────────────────────── -->
+  <header class="nav" id="nav">
+    <div class="nav__inner container">
+      <a href="#hero" class="nav__logo" aria-label="Home">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="8" fill="var(--color-primary)"/>
+          <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle"
+                font-family="'Cormorant Garamond', serif" font-weight="600"
+                font-size="18" fill="var(--color-on-primary)">AS</text>
+        </svg>
+      </a>
+
+      <nav class="nav__links" id="navLinks">
+        <a href="#about" class="nav__link">About</a>
+        <a href="#services" class="nav__link">Services</a>
+        <a href="#booking" class="nav__link">Booking</a>
+        <a href="#contacts" class="nav__link">Contacts</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+
+        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ─── HERO ─────────────────────────────────────────── -->
+    <section class="hero" id="hero">
+      <div class="hero__inner container">
+        <div class="hero__text">
+          <h1 class="hero__title">Anna Sokolova</h1>
+          <p class="hero__subtitle">Certified Massage Therapist &middot; 12 Years of Experience</p>
+          <p class="hero__tagline">Relieve tension, restore balance, and feel your best&nbsp;&mdash; with professional therapeutic massage in a calm, private setting.</p>
+          <a href="#booking" class="btn btn--primary hero__cta">Book a Session</a>
+        </div>
+        <div class="hero__photo">
+          <img src="https://picsum.photos/seed/massage/600/750"
+               alt="Anna Sokolova, massage therapist"
+               width="600" height="750" loading="eager">
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── ABOUT ────────────────────────────────────────── -->
+    <section class="about section" id="about">
+      <div class="about__inner container">
+        <div class="about__text">
+          <h2 class="section__title">About Me</h2>
+          <p>I'm Anna, a certified massage therapist with over 12&nbsp;years of hands-on experience. My practice blends classical European techniques with deep-tissue therapy, creating personalized sessions that target your specific needs.</p>
+          <p>Whether you're dealing with chronic pain, recovering from an injury, or simply need a restorative escape from daily stress, I provide a safe, comfortable environment where healing begins.</p>
+          <p>I hold certifications in Swedish Massage, Sports Massage, and Myofascial Release. Every session is tailored — because no two bodies are alike.</p>
+        </div>
+        <div class="about__stats">
+          <div class="stat-card">
+            <span class="stat-card__number">12+</span>
+            <span class="stat-card__label">Years of Experience</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__number">3,000+</span>
+            <span class="stat-card__label">Sessions Completed</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__number">5</span>
+            <span class="stat-card__label">Certifications</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__number">98%</span>
+            <span class="stat-card__label">Client Satisfaction</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SERVICES ─────────────────────────────────────── -->
+    <section class="services section" id="services">
+      <div class="container">
+        <h2 class="section__title">Services</h2>
+        <p class="section__subtitle">Every session is tailored to your body's needs. Choose the modality that speaks to you.</p>
+        <div class="services__grid">
+          <div class="service-card" data-service="Relaxation Massage" data-duration="60">
+            <div class="service-card__icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <h3 class="service-card__title">Relaxation Massage</h3>
+            <p class="service-card__desc">Gentle flowing strokes to ease tension, improve circulation, and promote deep relaxation. Perfect for stress relief.</p>
+            <div class="service-card__meta">
+              <span class="service-card__duration">60 min</span>
+              <span class="service-card__price">$80</span>
+            </div>
+            <button class="btn btn--outline service-card__btn" data-book>Book Now</button>
+          </div>
+
+          <div class="service-card" data-service="Deep Tissue Therapy" data-duration="90">
+            <div class="service-card__icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            </div>
+            <h3 class="service-card__title">Deep Tissue Therapy</h3>
+            <p class="service-card__desc">Targeted pressure on chronic muscle tension and knots. Ideal for pain relief, postural correction, and recovery.</p>
+            <div class="service-card__meta">
+              <span class="service-card__duration">90 min</span>
+              <span class="service-card__price">$120</span>
+            </div>
+            <button class="btn btn--outline service-card__btn" data-book>Book Now</button>
+          </div>
+
+          <div class="service-card" data-service="Sports Massage" data-duration="60">
+            <div class="service-card__icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <h3 class="service-card__title">Sports Massage</h3>
+            <p class="service-card__desc">Pre- and post-event techniques to enhance performance, prevent injury, and speed up recovery for active individuals.</p>
+            <div class="service-card__meta">
+              <span class="service-card__duration">60 min</span>
+              <span class="service-card__price">$90</span>
+            </div>
+            <button class="btn btn--outline service-card__btn" data-book>Book Now</button>
+          </div>
+
+          <div class="service-card" data-service="Myofascial Release" data-duration="75">
+            <div class="service-card__icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <h3 class="service-card__title">Myofascial Release</h3>
+            <p class="service-card__desc">Sustained pressure on connective tissue restrictions to eliminate pain, restore motion, and improve body alignment.</p>
+            <div class="service-card__meta">
+              <span class="service-card__duration">75 min</span>
+              <span class="service-card__price">$100</span>
+            </div>
+            <button class="btn btn--outline service-card__btn" data-book>Book Now</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── BOOKING ──────────────────────────────────────── -->
+    <section class="booking section" id="booking">
+      <div class="container">
+        <h2 class="section__title">Book a Session</h2>
+        <p class="section__subtitle">Select a date, choose an available time, and fill in your details.</p>
+
+        <div class="booking__layout">
+          <!-- Step 1: Date & Time -->
+          <div class="booking__calendar">
+            <div class="calendar">
+              <div class="calendar__header">
+                <button class="calendar__nav" id="calPrev" aria-label="Previous month">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <span class="calendar__month" id="calMonth"></span>
+                <button class="calendar__nav" id="calNext" aria-label="Next month">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+              <div class="calendar__weekdays">
+                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+              </div>
+              <div class="calendar__days" id="calDays"></div>
+            </div>
+
+            <div class="timeslots" id="timeslots">
+              <p class="timeslots__label">Available times</p>
+              <div class="timeslots__grid" id="timeslotsGrid"></div>
+              <p class="timeslots__empty" id="timeslotsEmpty" hidden>No available slots for this date.</p>
+            </div>
+          </div>
+
+          <!-- Step 2: Details form -->
+          <form class="booking__form" id="bookingForm">
+            <input type="hidden" id="bookDate" name="date">
+            <input type="hidden" id="bookTime" name="time">
+            <input type="hidden" id="bookService" name="service">
+            <input type="hidden" id="bookDuration" name="duration">
+
+            <div class="form-group">
+              <label for="bookSelectedService">Service</label>
+              <select id="bookSelectedService" required>
+                <option value="">Choose a service</option>
+                <option value="Relaxation Massage|60">Relaxation Massage (60 min) — $80</option>
+                <option value="Deep Tissue Therapy|90">Deep Tissue Therapy (90 min) — $120</option>
+                <option value="Sports Massage|60">Sports Massage (60 min) — $90</option>
+                <option value="Myofascial Release|75">Myofascial Release (75 min) — $100</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="bookName">Full Name</label>
+              <input type="text" id="bookName" name="name" required placeholder="Jane Doe" autocomplete="name">
+            </div>
+
+            <div class="form-group">
+              <label for="bookPhone">Phone</label>
+              <input type="tel" id="bookPhone" name="phone" required placeholder="+1 (555) 123-4567" autocomplete="tel">
+            </div>
+
+            <div class="form-group">
+              <label for="bookComment">Comment <span class="optional">(optional)</span></label>
+              <textarea id="bookComment" name="comment" rows="3" placeholder="Anything I should know?"></textarea>
+            </div>
+
+            <div class="booking__selected" id="bookingSummary" hidden>
+              <span id="summaryDate"></span> at <span id="summaryTime"></span>
+            </div>
+
+            <button type="submit" class="btn btn--primary booking__submit" id="bookSubmit" disabled>
+              Confirm Booking
+            </button>
+
+            <div class="booking__status" id="bookingStatus"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── CANCEL ───────────────────────────────────────── -->
+    <section class="cancel section" id="cancel" hidden>
+      <div class="container container--narrow">
+        <h2 class="section__title">Cancel Booking</h2>
+        <p>If you need to cancel, paste your cancellation token below.</p>
+        <form class="cancel__form" id="cancelForm">
+          <div class="form-group">
+            <label for="cancelToken">Cancellation Token</label>
+            <input type="text" id="cancelToken" required placeholder="Paste your token here">
+          </div>
+          <button type="submit" class="btn btn--danger">Cancel Booking</button>
+          <div class="cancel__status" id="cancelStatus"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ─── CONTACTS ─────────────────────────────────────── -->
+    <section class="contacts section" id="contacts">
+      <div class="container">
+        <h2 class="section__title">Get in Touch</h2>
+        <p class="section__subtitle">Have questions or prefer to book by phone? Reach out anytime.</p>
+        <div class="contacts__grid">
+          <div class="contact-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <h3>Phone</h3>
+            <a href="tel:+15551234567">+1 (555) 123-4567</a>
+          </div>
+          <div class="contact-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <h3>Email</h3>
+            <a href="mailto:hello@annasokolova.com">hello@annasokolova.com</a>
+          </div>
+          <div class="contact-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <h3>Location</h3>
+            <p>123 Wellness Ave, Suite 4<br>New York, NY 10001</p>
+          </div>
+          <div class="contact-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <h3>Hours</h3>
+            <p>Mon — Fri: 10:00 — 20:00<br>Sat — Sun: by appointment</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── FOOTER ───────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; <span id="currentYear"></span> Anna Sokolova. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ─── TOAST ────────────────────────────────────────── -->
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <!-- ─── MODAL: Booking Confirmation ──────────────────── -->
+  <div class="modal-overlay" id="confirmModal" hidden>
+    <div class="modal">
+      <button class="modal__close" id="modalClose" aria-label="Close">&times;</button>
+      <div class="modal__icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <h3 class="modal__title">Booking Confirmed!</h3>
+      <p class="modal__text" id="modalText"></p>
+      <div class="modal__token">
+        <label>Your cancellation token:</label>
+        <div class="modal__token-box">
+          <code id="modalToken"></code>
+          <button class="btn btn--small" id="modalCopy">Copy</button>
+        </div>
+        <p class="modal__token-hint">Save this token — you'll need it to cancel your booking.</p>
+      </div>
+      <button class="btn btn--primary modal__done" id="modalDone">Done</button>
+    </div>
+  </div>
+
+  <script src="./main.js"></script>
+</body>
+</html>
