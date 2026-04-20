@@ -322,12 +322,14 @@ img { max-width: 100%; height: auto; display: block; }
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
+  aspect-ratio: 3/4;
 }
 
 .hero__photo img {
   width: 100%;
-  aspect-ratio: 4/5;
+  height: 100%;
   object-fit: cover;
+  object-position: center top;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -891,7 +893,7 @@ img { max-width: 100%; height: auto; display: block; }
     gap: 40px;
   }
   .hero__photo { order: -1; }
-  .hero__photo img { aspect-ratio: 4/5; max-height: 500px; margin: 0 auto; }
+  .hero__photo img { max-height: 500px; margin: 0 auto; }
 
   .about__inner {
     grid-template-columns: 1fr;
