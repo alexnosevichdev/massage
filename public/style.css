@@ -787,16 +787,19 @@ img { max-width: 100%; height: auto; display: block; }
   position: fixed;
   inset: 0;
   background: var(--color-overlay);
-  display: flex;
   align-items: center;
   justify-content: center;
   z-index: 3000;
   padding: 24px;
+  display: none;
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.2s;
 }
 .modal-overlay:not([hidden]) {
+  display: flex;
   opacity: 1;
+  pointer-events: auto;
 }
 
 .modal {
