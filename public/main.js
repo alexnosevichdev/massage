@@ -16,6 +16,7 @@
   const calNext = $('#calNext');
   const timeslotsGrid = $('#timeslotsGrid');
   const timeslotsEmpty = $('#timeslotsEmpty');
+  const timeslotsUnavailable = $('#timeslotsUnavailable');
   const bookingForm = $('#bookingForm');
   const bookSubmit = $('#bookSubmit');
   const bookingSummary = $('#bookingSummary');
@@ -32,16 +33,12 @@
   const modalClose = $('#modalClose');
   const modalDone = $('#modalDone');
 
-  // Hidden form fields
   const bookDate = $('#bookDate');
   const bookTime = $('#bookTime');
-  const bookService = $('#bookService');
-  const bookDuration = $('#bookDuration');
-  const bookSelectedService = $('#bookSelectedService');
 
   // ─── State ──────────────────────────────────────────
 
-  let calYear, calMonthIdx; // current calendar view
+  let calYear, calMonthIdx;
   let selectedDate = null;
   let selectedTime = null;
 
@@ -132,15 +129,14 @@
     calMonth.textContent = `${MONTHS[calMonthIdx]} ${calYear}`;
 
     const firstDay = new Date(calYear, calMonthIdx, 1);
-    let startDay = firstDay.getDay(); // 0=Sun
-    startDay = startDay === 0 ? 6 : startDay - 1; // convert to Mon=0
+    let startDay = firstDay.getDay();
+    startDay = startDay === 0 ? 6 : startDay - 1;
 
     const daysInMonth = new Date(calYear, calMonthIdx + 1, 0).getDate();
     const today = todayISO();
 
     calDays.innerHTML = '';
 
-    // Empty cells for offset
     for (let i = 0; i < startDay; i++) {
       const el = document.createElement('div');
       el.className = 'calendar__day calendar__day--empty';
@@ -190,20 +186,22 @@
 
     timeslotsGrid.innerHTML = '<span class="timeslots__label" style="grid-column:1/-1;text-align:center;padding:12px;">Loading…</span>';
     timeslotsEmpty.hidden = true;
+    timeslotsUnavailable.hidden = true;
 
     try {
       const res = await fetch(`/api/slots?date=${iso}`);
       const data = await res.json();
 
-      if (data.dayOff) {
+      if (data.unavailable) {
         timeslotsGrid.innerHTML = '';
-        timeslotsEmpty.textContent = 'This is a day off.';
-        timeslotsEmpty.hidden = false;
+        timeslotsEmpty.hidden = true;
+        timeslotsUnavailable.hidden = false;
         return;
       }
 
       const available = data.slots.filter(s => !data.booked.includes(s));
       timeslotsGrid.innerHTML = '';
+      timeslotsUnavailable.hidden = true;
 
       if (data.slots.length === 0) {
         timeslotsEmpty.textContent = 'No available slots for this date.';
@@ -263,43 +261,14 @@
     validateForm();
   }
 
-  // ─── Service selection from cards ───────────────────
-
-  $$('[data-book]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const card = btn.closest('.service-card');
-      const service = card.dataset.service;
-      const duration = card.dataset.duration;
-      bookSelectedService.value = `${service}|${duration}`;
-      bookService.value = service;
-      bookDuration.value = duration;
-      document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
-      validateForm();
-    });
-  });
-
-  bookSelectedService.addEventListener('change', () => {
-    const val = bookSelectedService.value;
-    if (val) {
-      const [service, duration] = val.split('|');
-      bookService.value = service;
-      bookDuration.value = duration;
-    } else {
-      bookService.value = '';
-      bookDuration.value = '';
-    }
-    validateForm();
-  });
-
   // ─── Form validation ───────────────────────────────
 
   function validateForm() {
     const name = $('#bookName').value.trim();
     const phone = $('#bookPhone').value.trim();
-    const service = bookService.value;
     const date = bookDate.value;
     const time = bookTime.value;
-    bookSubmit.disabled = !(name && phone && service && date && time);
+    bookSubmit.disabled = !(name && phone && date && time);
   }
 
   ['bookName', 'bookPhone'].forEach(id => {
@@ -316,8 +285,6 @@
     const payload = {
       name: $('#bookName').value.trim(),
       phone: $('#bookPhone').value.trim(),
-      service: bookService.value,
-      duration: parseInt(bookDuration.value, 10),
       date: bookDate.value,
       time: bookTime.value,
       comment: $('#bookComment').value.trim(),
@@ -335,8 +302,6 @@
       if (data.success) {
         showConfirmModal(payload, data.token);
         bookingForm.reset();
-        bookService.value = '';
-        bookDuration.value = '';
         selectedDate = null;
         selectedTime = null;
         bookDate.value = '';
@@ -360,7 +325,7 @@
   function showConfirmModal(booking, token) {
     const d = new Date(booking.date + 'T00:00:00');
     const formatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    modalText.textContent = `${booking.service} on ${formatted} at ${booking.time}.`;
+    modalText.textContent = `Therapeutic Massage Session on ${formatted} at ${booking.time}.`;
     modalToken.textContent = token;
     confirmModal.hidden = false;
   }
@@ -437,9 +402,181 @@
     });
   }
 
+  // ─── FAQ Accordion ──────────────────────────────────
+
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const answer = btn.nextElementSibling;
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll('.faq-question').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+        b.nextElementSibling.hidden = true;
+      });
+      if (!isOpen) {
+        btn.setAttribute('aria-expanded', 'true');
+        answer.hidden = false;
+      }
+    });
+  });
+
+  // ─── Reviews Carousel ──────────────────────────────
+
+  const PLACEHOLDER_REVIEWS = [
+    { reviewer_name: 'Michael R.', review_text: 'Best sports massage I\'ve had. Helped enormously with my marathon recovery. Andrei really knows how to work with muscle tension.', rating: 5 },
+    { reviewer_name: 'Sarah K.', review_text: 'Professional, calm, and genuinely knowledgeable. I come every two weeks now. My chronic neck pain has improved significantly.', rating: 5 },
+    { reviewer_name: 'James T.', review_text: 'Andrei has a remarkable understanding of the body. My back pain of 3 years is finally manageable. Highly recommend.', rating: 5 },
+  ];
+
+  let allReviews = [];
+  let carouselPage = 0;
+
+  function renderStars(count) {
+    return '★'.repeat(count) + '☆'.repeat(5 - count);
+  }
+
+  function renderReviewCards(reviews) {
+    const carousel = $('#reviewsCarousel');
+    carousel.innerHTML = '';
+
+    const perPage = window.innerWidth <= 900 ? 1 : 3;
+    const totalPages = Math.ceil(reviews.length / perPage);
+    const start = carouselPage * perPage;
+    const visible = reviews.slice(start, start + perPage);
+
+    visible.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'review-card';
+      card.innerHTML =
+        `<div class="review-stars">${renderStars(r.rating || 5)}</div>` +
+        `<p class="review-text">"${r.review_text}"</p>` +
+        `<p class="review-author">— ${r.reviewer_name}</p>`;
+      carousel.appendChild(card);
+    });
+
+    const controls = $('#carouselControls');
+    const dotsContainer = $('#carouselDots');
+
+    if (totalPages > 1) {
+      controls.hidden = false;
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < totalPages; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'carousel-dot' + (i === carouselPage ? ' active' : '');
+        dot.addEventListener('click', () => { carouselPage = i; renderReviewCards(allReviews); });
+        dotsContainer.appendChild(dot);
+      }
+    } else {
+      controls.hidden = true;
+    }
+  }
+
+  function loadReviews() {
+    fetch('/api/reviews')
+      .then(r => r.json())
+      .then(data => {
+        allReviews = data.reviews && data.reviews.length > 0 ? data.reviews : PLACEHOLDER_REVIEWS;
+        carouselPage = 0;
+        renderReviewCards(allReviews);
+      })
+      .catch(() => {
+        allReviews = PLACEHOLDER_REVIEWS;
+        carouselPage = 0;
+        renderReviewCards(allReviews);
+      });
+  }
+
+  const prevBtn = $('#carouselPrev');
+  const nextBtn = $('#carouselNext');
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      const perPage = window.innerWidth <= 900 ? 1 : 3;
+      const totalPages = Math.ceil(allReviews.length / perPage);
+      carouselPage = (carouselPage - 1 + totalPages) % totalPages;
+      renderReviewCards(allReviews);
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const perPage = window.innerWidth <= 900 ? 1 : 3;
+      const totalPages = Math.ceil(allReviews.length / perPage);
+      carouselPage = (carouselPage + 1) % totalPages;
+      renderReviewCards(allReviews);
+    });
+  }
+
+  window.addEventListener('resize', () => {
+    renderReviewCards(allReviews);
+  });
+
+  // ─── Star Rating ────────────────────────────────────
+
+  let selectedRating = 5;
+  const starBtns = $$('.star-btn');
+
+  function updateStars(rating) {
+    starBtns.forEach(btn => {
+      const r = parseInt(btn.dataset.rating, 10);
+      btn.classList.toggle('active', r <= rating);
+    });
+  }
+
+  starBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedRating = parseInt(btn.dataset.rating, 10);
+      updateStars(selectedRating);
+    });
+    btn.addEventListener('mouseenter', () => {
+      updateStars(parseInt(btn.dataset.rating, 10));
+    });
+    btn.addEventListener('mouseleave', () => {
+      updateStars(selectedRating);
+    });
+  });
+  updateStars(selectedRating);
+
+  // ─── Review Form ────────────────────────────────────
+
+  const reviewForm = $('#reviewForm');
+  const reviewStatusEl = $('#reviewStatus');
+
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      reviewStatusEl.textContent = '';
+
+      const payload = {
+        name: $('#reviewName').value.trim(),
+        phone: $('#reviewPhone').value.trim(),
+        text: $('#reviewText').value.trim(),
+        rating: selectedRating,
+      };
+
+      try {
+        const res = await fetch('/api/reviews/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          reviewStatusEl.innerHTML = `<span style="color:var(--color-success);">${data.message}</span>`;
+          reviewForm.reset();
+          selectedRating = 5;
+          updateStars(selectedRating);
+        } else {
+          reviewStatusEl.innerHTML = `<span style="color:var(--color-danger);">${data.error}</span>`;
+        }
+      } catch (err) {
+        reviewStatusEl.innerHTML = '<span style="color:var(--color-danger);">Network error. Please try again.</span>';
+      }
+    });
+  }
+
   // ─── Init ───────────────────────────────────────────
 
   initTheme();
   initCalendar();
+  loadReviews();
 
 })();

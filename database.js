@@ -34,6 +34,16 @@ function init() {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_active_slot
       ON appointments (appointment_date, appointment_time)
       WHERE status = 'active';
+
+    CREATE TABLE IF NOT EXISTS reviews (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      reviewer_name TEXT NOT NULL,
+      reviewer_phone TEXT NOT NULL,
+      rating INTEGER DEFAULT 5,
+      review_text TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `);
 }
 
@@ -74,6 +84,34 @@ function getAppointmentByToken(token) {
   ).get(token);
 }
 
+function countAppointmentsByPhone(phone) {
+  const row = getDb().prepare(
+    `SELECT COUNT(*) AS cnt FROM appointments WHERE phone = ? AND (status = 'active' OR status = 'cancelled')`
+  ).get(phone);
+  return row.cnt;
+}
+
+function countReviewsByPhone(phone) {
+  const row = getDb().prepare(
+    `SELECT COUNT(*) AS cnt FROM reviews WHERE reviewer_phone = ?`
+  ).get(phone);
+  return row.cnt;
+}
+
+function insertReview({ name, phone, text, rating }) {
+  const stmt = getDb().prepare(`
+    INSERT INTO reviews (reviewer_name, reviewer_phone, review_text, rating)
+    VALUES (?, ?, ?, ?)
+  `);
+  return stmt.run(name, phone, text, rating);
+}
+
+function getApprovedReviews() {
+  return getDb().prepare(
+    `SELECT * FROM reviews WHERE status = 'approved' ORDER BY created_at DESC`
+  ).all();
+}
+
 module.exports = {
   getDb,
   getBookedSlots,
@@ -81,4 +119,8 @@ module.exports = {
   insertAppointment,
   cancelAppointment,
   getAppointmentByToken,
+  countAppointmentsByPhone,
+  countReviewsByPhone,
+  insertReview,
+  getApprovedReviews,
 };

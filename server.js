@@ -11,36 +11,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 const PORT = process.env.PORT || 3000;
 const TG_TOKEN = process.env.TG_TOKEN;
 const TG_CHAT_ID = process.env.TG_CHAT_ID;
-const WORK_START = process.env.WORK_START || '10:00';
-const WORK_END = process.env.WORK_END || '20:00';
-const SLOT_DURATION = parseInt(process.env.SLOT_DURATION, 10) || 60;
-const WORK_DAYS = (process.env.WORK_DAYS || '1,2,3,4,5').split(',').map(Number);
+
+const FIXED_SLOTS = ['08:00','09:30','11:00','12:30','14:00','15:30','17:00','18:30','19:30'];
+const AVAILABLE_DAYS = [3, 5]; // Wednesday, Friday (JS getDay(): 0=Sun)
 
 // ─── Helpers ────────────────────────────────────────────────
-
-function generateSlots(startStr, endStr, durationMin) {
-  const [sh, sm] = startStr.split(':').map(Number);
-  const [eh, em] = endStr.split(':').map(Number);
-  const startMinutes = sh * 60 + sm;
-  const endMinutes = eh * 60 + em;
-  const slots = [];
-  for (let m = startMinutes; m + durationMin <= endMinutes; m += durationMin) {
-    const hh = String(Math.floor(m / 60)).padStart(2, '0');
-    const mm = String(m % 60).padStart(2, '0');
-    slots.push(`${hh}:${mm}`);
-  }
-  return slots;
-}
 
 function isValidDate(str) {
   return /^\d{4}-\d{2}-\d{2}$/.test(str) && !isNaN(Date.parse(str));
 }
 
-function isWorkDay(dateStr) {
+function isAvailableDay(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
-  const jsDay = d.getDay(); // 0=Sun
-  const isoDay = jsDay === 0 ? 7 : jsDay;
-  return WORK_DAYS.includes(isoDay);
+  return AVAILABLE_DAYS.includes(d.getDay());
 }
 
 function nowMinutes() {
@@ -89,11 +72,11 @@ app.get('/api/slots', (req, res) => {
     return res.status(400).json({ error: 'Cannot view past dates.' });
   }
 
-  if (!isWorkDay(date)) {
-    return res.json({ slots: [], booked: [], dayOff: true });
+  if (!isAvailableDay(date)) {
+    return res.json({ slots: [], booked: [], unavailable: true });
   }
 
-  let slots = generateSlots(WORK_START, WORK_END, SLOT_DURATION);
+  let slots = [...FIXED_SLOTS];
 
   if (date === today) {
     const current = nowMinutes();
@@ -109,9 +92,11 @@ app.get('/api/slots', (req, res) => {
 });
 
 app.post('/api/book', (req, res) => {
-  const { name, phone, service, duration, date, time, comment } = req.body;
+  const { name, phone, date, time, comment } = req.body;
+  const service = 'Therapeutic Massage Session';
+  const duration = 60;
 
-  if (!name || !phone || !service || !duration || !date || !time) {
+  if (!name || !phone || !date || !time) {
     return res.status(400).json({ success: false, error: 'All fields are required.' });
   }
   if (!isValidDate(date)) {
@@ -120,12 +105,11 @@ app.post('/api/book', (req, res) => {
   if (date < todayISO()) {
     return res.status(400).json({ success: false, error: 'Cannot book in the past.' });
   }
-  if (!isWorkDay(date)) {
-    return res.status(400).json({ success: false, error: 'Selected date is a day off.' });
+  if (!isAvailableDay(date)) {
+    return res.status(400).json({ success: false, error: 'Sessions are available on Wednesdays and Fridays only.' });
   }
 
-  const allSlots = generateSlots(WORK_START, WORK_END, SLOT_DURATION);
-  if (!allSlots.includes(time)) {
+  if (!FIXED_SLOTS.includes(time)) {
     return res.status(400).json({ success: false, error: 'Invalid time slot.' });
   }
 
@@ -180,6 +164,44 @@ app.post('/api/cancel', (req, res) => {
   }
 
   res.json({ success: true, message: 'Your booking has been cancelled.' });
+});
+
+// ─── Review Routes ──────────────────────────────────────────
+
+app.post('/api/reviews/submit', (req, res) => {
+  const { name, phone, text, rating } = req.body;
+
+  if (!name || !text) {
+    return res.status(400).json({ success: false, error: 'Name and review text are required.' });
+  }
+
+  const r = parseInt(rating, 10);
+  if (!r || r < 1 || r > 5) {
+    return res.status(400).json({ success: false, error: 'Rating must be between 1 and 5.' });
+  }
+
+  if (!phone) {
+    return res.status(400).json({ success: false, error: 'Phone number is required.' });
+  }
+
+  const appointmentCount = db.countAppointmentsByPhone(phone);
+  if (appointmentCount === 0) {
+    return res.json({ success: false, error: 'Only clients who have booked a session can leave a review.' });
+  }
+
+  const reviewCount = db.countReviewsByPhone(phone);
+  if (reviewCount > 0) {
+    return res.json({ success: false, error: 'You have already submitted a review.' });
+  }
+
+  db.insertReview({ name, phone, text, rating: r });
+
+  res.json({ success: true, message: 'Thank you! Your review will appear after approval.' });
+});
+
+app.get('/api/reviews', (_req, res) => {
+  const reviews = db.getApprovedReviews();
+  res.json({ reviews });
 });
 
 // SPA fallback
