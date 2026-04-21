@@ -26,7 +26,7 @@ function init() {
       appointment_date TEXT    NOT NULL,
       appointment_time TEXT    NOT NULL,
       comment          TEXT,
-      cancel_token     TEXT    UNIQUE NOT NULL,
+      cancel_token     TEXT,
       status           TEXT    DEFAULT 'active',
       created_at       TEXT    DEFAULT (datetime('now'))
     );
@@ -63,25 +63,34 @@ function isSlotTaken(date, time) {
   return !!row;
 }
 
-function insertAppointment({ name, phone, service, duration, date, time, comment, cancelToken }) {
+function insertAppointment({ name, phone, service, duration, date, time, comment }) {
   const stmt = getDb().prepare(`
-    INSERT INTO appointments (name, phone, service, duration, appointment_date, appointment_time, comment, cancel_token)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO appointments (name, phone, service, duration, appointment_date, appointment_time, comment)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
-  return stmt.run(name, phone, service, duration, date, time, comment || null, cancelToken);
+  return stmt.run(name, phone, service, duration, date, time, comment || null);
 }
 
-function cancelAppointment(token) {
-  const stmt = getDb().prepare(
-    `UPDATE appointments SET status = 'cancelled' WHERE cancel_token = ? AND status = 'active'`
-  );
-  return stmt.run(token);
-}
-
-function getAppointmentByToken(token) {
+function getActiveAppointmentsByPhone(phone, todayISO) {
   return getDb().prepare(
-    `SELECT * FROM appointments WHERE cancel_token = ?`
-  ).get(token);
+    `SELECT id, name, service, appointment_date, appointment_time
+     FROM appointments
+     WHERE phone = ? AND status = 'active' AND appointment_date >= ?
+     ORDER BY appointment_date, appointment_time`
+  ).all(phone, todayISO);
+}
+
+function cancelAppointmentById(id, phone) {
+  const stmt = getDb().prepare(
+    `UPDATE appointments SET status = 'cancelled' WHERE id = ? AND phone = ? AND status = 'active'`
+  );
+  return stmt.run(id, phone);
+}
+
+function getAppointmentById(id) {
+  return getDb().prepare(
+    `SELECT * FROM appointments WHERE id = ?`
+  ).get(id);
 }
 
 function countAppointmentsByPhone(phone) {
@@ -117,8 +126,9 @@ module.exports = {
   getBookedSlots,
   isSlotTaken,
   insertAppointment,
-  cancelAppointment,
-  getAppointmentByToken,
+  getActiveAppointmentsByPhone,
+  cancelAppointmentById,
+  getAppointmentById,
   countAppointmentsByPhone,
   countReviewsByPhone,
   insertReview,

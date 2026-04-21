@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const crypto = require('crypto');
 const path = require('path');
 const db = require('./database');
 
@@ -13,7 +12,8 @@ const TG_TOKEN = process.env.TG_TOKEN;
 const TG_CHAT_ID = process.env.TG_CHAT_ID;
 
 const FIXED_SLOTS = ['08:00','09:30','11:00','12:30','14:00','15:30','17:00','18:30','19:30'];
-const AVAILABLE_DAYS = [3, 5]; // Wednesday, Friday (JS getDay(): 0=Sun)
+const LATE_SLOTS = ['18:30', '19:30'];
+const AVAILABLE_DAYS = [3, 5];
 
 // ─── Helpers ────────────────────────────────────────────────
 
@@ -110,19 +110,18 @@ app.post('/api/book', (req, res) => {
   if (!isAvailableDay(date)) {
     return res.status(400).json({ success: false, error: 'Sessions are available on Wednesdays and Fridays only.' });
   }
-
   if (!FIXED_SLOTS.includes(time)) {
     return res.status(400).json({ success: false, error: 'Invalid time slot.' });
   }
-
+  if (duration === 90 && LATE_SLOTS.includes(time)) {
+    return res.status(400).json({ success: false, error: '90-min sessions cannot be booked at 18:30 or 19:30.' });
+  }
   if (db.isSlotTaken(date, time)) {
     return res.status(409).json({ success: false, error: 'This slot was just taken. Please choose another time.' });
   }
 
-  const cancelToken = crypto.randomBytes(32).toString('hex');
-
   try {
-    db.insertAppointment({ name, phone, service, duration, date, time, comment, cancelToken });
+    db.insertAppointment({ name, phone, service, duration, date, time, comment });
   } catch (err) {
     if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
       return res.status(409).json({ success: false, error: 'This slot was just taken. Please choose another time.' });
@@ -140,17 +139,31 @@ app.post('/api/book', (req, res) => {
     `💬 Comment: ${comment || '—'}`;
   sendTelegram(tgMessage);
 
-  res.json({ success: true, token: cancelToken, message: "You're booked!" });
+  res.json({ success: true, message: "You're booked!" });
 });
 
-app.post('/api/cancel', (req, res) => {
-  const { token } = req.body;
-  if (!token) {
-    return res.status(400).json({ success: false, error: 'Token is required.' });
+// ─── Cancel Routes (phone-based) ────────────────────────────
+
+app.post('/api/cancel/lookup', (req, res) => {
+  const { phone } = req.body;
+  if (!phone) {
+    return res.status(400).json({ success: false, error: 'Phone number is required.' });
   }
 
-  const appointment = db.getAppointmentByToken(token);
-  const result = db.cancelAppointment(token);
+  const today = todayISO();
+  const appointments = db.getActiveAppointmentsByPhone(phone, today);
+
+  res.json({ success: true, appointments });
+});
+
+app.post('/api/cancel/confirm', (req, res) => {
+  const { id, phone } = req.body;
+  if (!id || !phone) {
+    return res.status(400).json({ success: false, error: 'Appointment ID and phone are required.' });
+  }
+
+  const appointment = db.getAppointmentById(id);
+  const result = db.cancelAppointmentById(id, phone);
 
   if (result.changes === 0) {
     return res.status(404).json({ success: false, error: 'Booking not found or already cancelled.' });
@@ -161,11 +174,12 @@ app.post('/api/cancel', (req, res) => {
       `❌ <b>Booking Cancelled</b>\n` +
       `👤 Name: ${appointment.name}\n` +
       `📅 ${appointment.appointment_date} at ${appointment.appointment_time}\n` +
-      `💆 Service: ${appointment.service}`;
+      `💆 ${appointment.service}\n` +
+      `❗ Cancelled by client via website`;
     sendTelegram(tgMessage);
   }
 
-  res.json({ success: true, message: 'Your booking has been cancelled.' });
+  res.json({ success: true, message: 'Your appointment has been cancelled.' });
 });
 
 // ─── Review Routes ──────────────────────────────────────────
