@@ -33,6 +33,7 @@
 
       <nav class="nav__links" id="navLinks">
         <a href="#about" class="nav__link">About</a>
+        <a href="#credentials" class="nav__link">Credentials</a>
         <a href="#services" class="nav__link">Services</a>
         <a href="#booking" class="nav__link">Booking</a>
         <a href="#cancel" class="nav__link">Cancel</a>
@@ -68,7 +69,7 @@
           <a href="#booking" class="btn btn--primary hero__cta">Book a Session</a>
         </div>
         <div class="hero__photo">
-          <img src="./assets/andrey.jpg"
+          <img src="./assets/andrey-main.jpg"
                alt="Andrey Tuchkov, massage therapist in San Diego"
                width="600" height="800" loading="eager">
         </div>
@@ -80,21 +81,52 @@
       <div class="about__inner container">
         <div class="about__text">
           <h2 class="section__title">About Me</h2>
-          <p>My name is Andrey Tuchkov. I've been practising therapeutic and deep tissue massage for over 15&nbsp;years, working with clients who deal with chronic pain, postural imbalances, sports injuries and stress-related tension.</p>
-          <p>My approach is always hands-on and individual&nbsp;&mdash; I take time to understand what your body needs before every session. Whether you're recovering from an injury, sitting at a desk all day, or training hard&nbsp;&mdash; I'll help you move and feel better.</p>
+          <div class="bio-preview">
+            <p>My name is Andrey Tuchkov, and my whole professional life has been connected with the body. For me, this is not just a profession — it's a way to genuinely help people feel better, move more freely, and feel more at ease in their bodies.</p>
+            <div class="bio-fade"></div>
+          </div>
+          <div class="bio-full" hidden>
+            <p>Over more than 15 years of practice, I've worked with thousands of people. I've worked both with everyday clients who want to maintain their bodies in good condition, and with more demanding individuals. Among my clients were members of the city administration and mayor's office where I previously lived — and that always comes with responsibility and the need for consistent, reliable results.</p>
+            <p>Over the years, I've worked with people from many different countries: Russia, Ukraine, Belarus, Kazakhstan, Poland, the Czech Republic, Norway, Turkey, Korea, Mexico, the United States, Canada, Armenia, Costa Rica… Working with people from different countries, I noticed one simple thing: the human body is built the same way… and it tends to hurt in very similar places. Well, it seems that muscles don't really care about nationality — they just do their job.</p>
+            <p>In my practice, I've also worked with more complex cases. I've helped support physical development in babies born significantly premature. I've worked with people dealing with anorexia. I also worked in a medical center focused on weight loss, supporting clients as their bodies went through significant physical changes. I've supported recovery after accidents, surgeries, and strokes. I've worked with paralyzed clients, with elderly individuals aged 87+, and with a teenager with cerebral palsy. In these situations, it's especially important to work carefully, attentively, and without relying on templates — to understand what is happening in the body and how to work with it. This approach leads to real, noticeable improvements in how a person feels and functions.</p>
+            <p>All of this is in addition to more common situations where a person is considered 'healthy,' but lives with constant tension in the neck, shoulders, back, or legs… or, on the contrary, with a sense of weakness and lack of support in the body.</p>
+            <p>Over time, I've come to understand one clear thing: everyone can benefit from massage. And the more accumulated issues a person has, the more obvious it becomes that a systematic approach is necessary. In most cases, one type of massage is not enough — the body needs thoughtful, consistent work.</p>
+            <p>That's why I don't follow a template. In each session, I combine different techniques and approaches, selecting them based on the individual and their current condition. This may include deep tissue work, stretching, and structural work — depending on the goal. This approach doesn't just provide temporary relief, but leads to noticeable and lasting results.</p>
+            <p>People don't come to me only to relax. They come when they want to better understand their body, reduce pain, restore mobility, feel lighter… and simply start feeling like themselves again.</p>
+          </div>
+          <button class="btn-read-more" id="readMoreBtn">Read more</button>
         </div>
-        <div class="about__stats">
-          <div class="stat-card">
-            <span class="stat-card__number">15+</span>
-            <span class="stat-card__label">Years of Experience</span>
+        <div class="about__photo">
+          <img src="./assets/andrey-work-1.jpg"
+               alt="Andrey Tuchkov performing therapeutic massage"
+               width="500" height="600" loading="lazy"
+               style="object-fit: cover; border-radius: 12px; width: 100%; height: 100%;">
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── CREDENTIALS ────────────────────────────────────── -->
+    <section id="credentials" class="section">
+      <div class="container">
+        <h2 class="section__title">Credentials &amp; Training</h2>
+        <p class="section__subtitle">15+ years of professional practice backed by formal training.</p>
+        <div class="credentials-grid">
+          <div class="cert-card">
+            <img src="./assets/andrey-cert.jpg"
+                 alt="Massage therapy certificate — Andrei Tuchkov"
+                 width="400" height="300" loading="lazy"
+                 class="cert-image">
+            <p class="cert-label">Professional Certification</p>
           </div>
-          <div class="stat-card">
-            <span class="stat-card__number">Deep</span>
-            <span class="stat-card__label">Pain Relief &amp; Recovery</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-card__number">SD</span>
-            <span class="stat-card__label">San Diego, CA</span>
+          <div class="credentials-text">
+            <ul class="credentials-list">
+              <li>✦ 15+ years of hands-on practice</li>
+              <li>✦ Thousands of sessions completed</li>
+              <li>✦ Deep tissue &amp; therapeutic massage specialist</li>
+              <li>✦ Experience with post-surgical &amp; stroke recovery</li>
+              <li>✦ Clients from 15+ countries worldwide</li>
+              <li>✦ Work with complex and medical cases</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -158,6 +190,15 @@
             <button class="btn btn--outline service-card__btn" data-book>Book Now</button>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ─── PHOTO STRIP ─────────────────────────────────── -->
+    <section class="photo-strip">
+      <div class="photo-strip-inner">
+        <img src="./assets/andrey-work-2.jpg"
+             alt="Andrey Tuchkov working with a client outdoors in San Diego"
+             width="1200" height="500" loading="lazy">
       </div>
     </section>
 

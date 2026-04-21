@@ -423,6 +423,20 @@
     });
   });
 
+  // ─── Read more toggle ──────────────────────────────
+
+  const readMoreBtn = $('#readMoreBtn');
+  const bioFull = $('.bio-full');
+  const bioFade = $('.bio-fade');
+  if (readMoreBtn) {
+    readMoreBtn.addEventListener('click', () => {
+      const isExpanded = !bioFull.hidden;
+      bioFull.hidden = isExpanded;
+      bioFade.style.display = isExpanded ? 'block' : 'none';
+      readMoreBtn.textContent = isExpanded ? 'Read more' : 'Read less';
+    });
+  }
+
   // ─── Init ───────────────────────────────────────────
 
   initTheme();
