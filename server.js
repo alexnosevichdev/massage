@@ -93,8 +93,10 @@ app.get('/api/slots', (req, res) => {
 
 app.post('/api/book', (req, res) => {
   const { name, phone, date, time, comment } = req.body;
-  const service = 'Therapeutic Massage Session';
-  const duration = 60;
+  const clientDuration = parseInt(req.body.duration, 10);
+  const duration = clientDuration === 90 ? 90 : 60;
+  const price = duration === 90 ? 200 : 140;
+  const service = `${duration} min session — $${price}`;
 
   if (!name || !phone || !date || !time) {
     return res.status(400).json({ success: false, error: 'All fields are required.' });
@@ -132,7 +134,7 @@ app.post('/api/book', (req, res) => {
     `📋 <b>New Booking!</b>\n` +
     `👤 Name: ${name}\n` +
     `📞 Phone: ${phone}\n` +
-    `💆 Service: ${service} (${duration} min)\n` +
+    `💆 Session: ${service}\n` +
     `📅 Date: ${date}\n` +
     `🕐 Time: ${time}\n` +
     `💬 Comment: ${comment || '—'}`;

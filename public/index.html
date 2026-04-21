@@ -56,16 +56,11 @@
     <section class="hero" id="hero">
       <div class="hero__inner container">
         <div class="hero__text">
-          <div class="hero-brand">
-            <img src="./assets/divider-logo.jpg"
-                 alt="In Trusted Hands — Massage Therapy by Andrei Tuchkov"
-                 width="500" height="200" loading="eager"
-                 class="hero-brand-img">
-          </div>
           <h1 class="hero__title">Andrei Tuchkov</h1>
           <p class="hero__subtitle">Therapeutic Massage &middot; La Mesa, San Diego</p>
           <p class="hero__tagline">Specialising in pain relief, posture correction and recovery. 15+ years of hands-on experience helping people feel and move better.</p>
           <a href="#booking" class="btn btn--primary hero__cta">Book Your Session</a>
+          <div class="cta-price-note">60 min — $140 · 90 min — $200</div>
         </div>
         <div class="hero__photo">
           <img src="./assets/andrey-main.jpg"
@@ -74,11 +69,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ─── DIVIDER ── -->
-    <div class="section-divider" aria-hidden="true">
-      <img src="./assets/divider-wave.jpg" alt="" width="1280" height="80" loading="lazy" class="divider-wave">
-    </div>
 
     <!-- ─── ABOUT ────────────────────────────────────────── -->
     <section class="about section" id="about">
@@ -108,11 +98,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ─── DIVIDER ── -->
-    <div class="section-divider" aria-hidden="true">
-      <img src="./assets/divider-wave.jpg" alt="" width="1280" height="80" loading="lazy" class="divider-wave">
-    </div>
 
     <!-- ─── FAQ ──────────────────────────────────────────── -->
     <section id="faq" class="section">
@@ -228,11 +213,7 @@
     <!-- ─── CTA ── -->
     <div class="cta-block">
       <a href="#booking" class="btn btn--primary btn-large">Book Your Session</a>
-    </div>
-
-    <!-- ─── DIVIDER ── -->
-    <div class="section-divider" aria-hidden="true">
-      <img src="./assets/divider-wave.jpg" alt="" width="1280" height="80" loading="lazy" class="divider-wave">
+      <div class="cta-price-note">60 min — $140 · 90 min — $200</div>
     </div>
 
     <!-- ─── REVIEWS ──────────────────────────────────────── -->
@@ -280,6 +261,7 @@
     <!-- ─── CTA ── -->
     <div class="cta-block">
       <a href="#booking" class="btn btn--primary btn-large">Book Your Session</a>
+      <div class="cta-price-note">60 min — $140 · 90 min — $200</div>
     </div>
 
     <!-- ─── Instagram ── -->
@@ -287,11 +269,6 @@
       <a href="https://www.instagram.com/massage_andree" target="_blank" rel="noopener noreferrer">
         Follow on Instagram @massage_andree
       </a>
-    </div>
-
-    <!-- ─── DIVIDER ── -->
-    <div class="section-divider" aria-hidden="true">
-      <img src="./assets/divider-wave.jpg" alt="" width="1280" height="80" loading="lazy" class="divider-wave">
     </div>
 
     <!-- ─── PHOTO STRIP ─────────────────────────────────── -->
@@ -303,11 +280,6 @@
       </div>
     </section>
 
-    <!-- ─── DIVIDER ── -->
-    <div class="section-divider" aria-hidden="true">
-      <img src="./assets/divider-wave.jpg" alt="" width="1280" height="80" loading="lazy" class="divider-wave">
-    </div>
-
     <!-- ─── BOOKING ──────────────────────────────────────── -->
     <section class="booking section" id="booking">
       <div class="container">
@@ -317,20 +289,17 @@
         <div class="booking__layout">
           <!-- Step 1: Date & Time -->
           <div class="booking__calendar">
-            <div class="calendar">
-              <div class="calendar__header">
-                <button class="calendar__nav" id="calPrev" aria-label="Previous month">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                </button>
-                <span class="calendar__month" id="calMonth"></span>
-                <button class="calendar__nav" id="calNext" aria-label="Next month">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                </button>
+            <div class="custom-calendar" id="bookingCalendar">
+              <div class="cal-header">
+                <button type="button" class="cal-nav cal-prev" id="calPrev" aria-label="Previous month">&#8249;</button>
+                <span class="cal-month-label" id="calMonth"></span>
+                <button type="button" class="cal-nav cal-next" id="calNext" aria-label="Next month">&#8250;</button>
               </div>
-              <div class="calendar__weekdays">
-                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+              <div class="cal-weekdays">
+                <span>Sun</span><span>Mon</span><span>Tue</span>
+                <span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
               </div>
-              <div class="calendar__days" id="calDays"></div>
+              <div class="cal-days" id="calDays"></div>
             </div>
 
             <div class="timeslots" id="timeslots">
@@ -345,6 +314,15 @@
           <form class="booking__form" id="bookingForm">
             <input type="hidden" id="bookDate" name="date">
             <input type="hidden" id="bookTime" name="time">
+
+            <div class="duration-toggle" id="durationToggle">
+              <button type="button" class="duration-btn active" data-duration="60" data-price="140">
+                60 min — $140
+              </button>
+              <button type="button" class="duration-btn" data-duration="90" data-price="200">
+                90 min — $200
+              </button>
+            </div>
 
             <div class="form-group">
               <label for="bookName">Full Name</label>
@@ -375,11 +353,6 @@
       </div>
     </section>
 
-    <!-- ─── DIVIDER ── -->
-    <div class="section-divider" aria-hidden="true">
-      <img src="./assets/divider-wave.jpg" alt="" width="1280" height="80" loading="lazy" class="divider-wave">
-    </div>
-
     <!-- ─── CANCEL ───────────────────────────────────────── -->
     <section class="cancel section" id="cancel">
       <div class="container container--narrow">
@@ -395,11 +368,6 @@
         </form>
       </div>
     </section>
-
-    <!-- ─── DIVIDER ── -->
-    <div class="section-divider" aria-hidden="true">
-      <img src="./assets/divider-wave.jpg" alt="" width="1280" height="80" loading="lazy" class="divider-wave">
-    </div>
 
     <!-- ─── CONTACTS ─────────────────────────────────────── -->
     <section class="contacts section" id="contacts">

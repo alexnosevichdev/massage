@@ -1,8 +1,6 @@
 (function () {
   'use strict';
 
-  // ─── DOM refs ───────────────────────────────────────
-
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
 
@@ -10,7 +8,7 @@
   const hamburger = $('#hamburger');
   const navLinks = $('#navLinks');
   const themeToggle = $('#themeToggle');
-  const calMonth = $('#calMonth');
+  const calMonthLabel = $('#calMonth');
   const calDays = $('#calDays');
   const calPrev = $('#calPrev');
   const calNext = $('#calNext');
@@ -41,6 +39,8 @@
   let calYear, calMonthIdx;
   let selectedDate = null;
   let selectedTime = null;
+  let selectedDuration = 60;
+  let selectedPrice = 140;
 
   // ─── Theme ──────────────────────────────────────────
 
@@ -102,7 +102,18 @@
     toastTimer = setTimeout(() => toast.classList.remove('toast--visible'), 4000);
   }
 
-  // ─── Calendar ───────────────────────────────────────
+  // ─── Duration Toggle ───────────────────────────────
+
+  $$('.duration-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.duration-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedDuration = parseInt(btn.dataset.duration, 10);
+      selectedPrice = parseInt(btn.dataset.price, 10);
+    });
+  });
+
+  // ─── Custom Calendar ───────────────────────────────
 
   const MONTHS = ['January','February','March','April','May','June',
                   'July','August','September','October','November','December'];
@@ -118,6 +129,14 @@
     return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
   }
 
+  function getMaxMonth() {
+    const now = new Date();
+    let m = now.getMonth() + 2;
+    let y = now.getFullYear();
+    if (m > 11) { m -= 12; y++; }
+    return { year: y, month: m };
+  }
+
   function initCalendar() {
     const now = new Date();
     calYear = now.getFullYear();
@@ -126,11 +145,19 @@
   }
 
   function renderCalendar() {
-    calMonth.textContent = `${MONTHS[calMonthIdx]} ${calYear}`;
+    calMonthLabel.textContent = `${MONTHS[calMonthIdx]} ${calYear}`;
+
+    const now = new Date();
+    const currentMonth = now.getFullYear() * 12 + now.getMonth();
+    const viewMonth = calYear * 12 + calMonthIdx;
+    const max = getMaxMonth();
+    const maxMonth = max.year * 12 + max.month;
+
+    calPrev.disabled = viewMonth <= currentMonth;
+    calNext.disabled = viewMonth >= maxMonth;
 
     const firstDay = new Date(calYear, calMonthIdx, 1);
-    let startDay = firstDay.getDay();
-    startDay = startDay === 0 ? 6 : startDay - 1;
+    const startDay = firstDay.getDay(); // Sun=0
 
     const daysInMonth = new Date(calYear, calMonthIdx + 1, 0).getDate();
     const today = todayISO();
@@ -139,36 +166,59 @@
 
     for (let i = 0; i < startDay; i++) {
       const el = document.createElement('div');
-      el.className = 'calendar__day calendar__day--empty';
+      el.className = 'cal-day empty';
       calDays.appendChild(el);
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
       const iso = dateISO(calYear, calMonthIdx, d);
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'calendar__day';
-      btn.textContent = d;
+      const dayDate = new Date(calYear, calMonthIdx, d);
+      const dayOfWeek = dayDate.getDay();
+      const isPast = iso < today;
+      const isWedOrFri = dayOfWeek === 3 || dayOfWeek === 5;
 
-      if (iso === today) btn.classList.add('calendar__day--today');
-      if (iso === selectedDate) btn.classList.add('calendar__day--selected');
-      if (iso < today) {
-        btn.disabled = true;
-      } else {
-        btn.addEventListener('click', () => selectDate(iso));
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.textContent = d;
+
+      let cls = 'cal-day';
+      if (isPast) {
+        cls += ' past';
+      } else if (isWedOrFri) {
+        cls += ' available';
+      }
+      if (iso === today && isWedOrFri && !isPast) {
+        cls += ' today';
+      }
+      if (iso === selectedDate) {
+        cls += ' selected';
       }
 
-      calDays.appendChild(btn);
+      el.className = cls;
+
+      if (!isPast && isWedOrFri) {
+        el.addEventListener('click', () => selectDate(iso));
+      }
+
+      calDays.appendChild(el);
     }
   }
 
   calPrev.addEventListener('click', () => {
+    const now = new Date();
+    const currentMonth = now.getFullYear() * 12 + now.getMonth();
+    const viewMonth = calYear * 12 + calMonthIdx;
+    if (viewMonth <= currentMonth) return;
     calMonthIdx--;
     if (calMonthIdx < 0) { calMonthIdx = 11; calYear--; }
     renderCalendar();
   });
 
   calNext.addEventListener('click', () => {
+    const max = getMaxMonth();
+    const maxMonth = max.year * 12 + max.month;
+    const viewMonth = calYear * 12 + calMonthIdx;
+    if (viewMonth >= maxMonth) return;
     calMonthIdx++;
     if (calMonthIdx > 11) { calMonthIdx = 0; calYear++; }
     renderCalendar();
@@ -184,7 +234,7 @@
     updateSummary();
     renderCalendar();
 
-    timeslotsGrid.innerHTML = '<span class="timeslots__label" style="grid-column:1/-1;text-align:center;padding:12px;">Loading…</span>';
+    timeslotsGrid.innerHTML = '<span class="timeslots__label" style="text-align:center;padding:12px;">Loading…</span>';
     timeslotsEmpty.hidden = true;
     timeslotsUnavailable.hidden = true;
 
@@ -287,6 +337,7 @@
       phone: $('#bookPhone').value.trim(),
       date: bookDate.value,
       time: bookTime.value,
+      duration: selectedDuration,
       comment: $('#bookComment').value.trim(),
     };
 
@@ -308,6 +359,12 @@
         bookTime.value = '';
         bookingSummary.hidden = true;
         timeslotsGrid.innerHTML = '';
+        // Re-activate 60 min as default
+        selectedDuration = 60;
+        selectedPrice = 140;
+        $$('.duration-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.duration === '60');
+        });
         renderCalendar();
       } else {
         showToast(data.error || 'Booking failed.', true);
@@ -325,7 +382,9 @@
   function showConfirmModal(booking, token) {
     const d = new Date(booking.date + 'T00:00:00');
     const formatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    modalText.textContent = `Therapeutic Massage Session on ${formatted} at ${booking.time}.`;
+    const dur = booking.duration || 60;
+    const price = dur === 90 ? 200 : 140;
+    modalText.textContent = `${dur} min session ($${price}) on ${formatted} at ${booking.time}.`;
     modalToken.textContent = token;
     confirmModal.hidden = false;
   }
@@ -431,7 +490,7 @@
   let carouselPage = 0;
 
   function renderStars(count) {
-    return '★'.repeat(count) + '☆'.repeat(5 - count);
+    return '\u2605'.repeat(count) + '\u2606'.repeat(5 - count);
   }
 
   function renderReviewCards(reviews) {
@@ -449,7 +508,7 @@
       card.innerHTML =
         `<div class="review-stars">${renderStars(r.rating || 5)}</div>` +
         `<p class="review-text">"${r.review_text}"</p>` +
-        `<p class="review-author">— ${r.reviewer_name}</p>`;
+        `<p class="review-author">\u2014 ${r.reviewer_name}</p>`;
       carousel.appendChild(card);
     });
 
