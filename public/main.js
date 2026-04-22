@@ -557,47 +557,6 @@
   if (nextBtn) nextBtn.addEventListener('click', () => { const pp = window.innerWidth <= 900 ? 1 : 3; const tp = Math.ceil(allReviews.length / pp); carouselPage = (carouselPage + 1) % tp; renderReviewCards(allReviews); });
   window.addEventListener('resize', () => renderReviewCards(allReviews));
 
-  // ─── Star Rating ────────────────────────────────────
-
-  let selectedRating = 5;
-  const starBtns = $$('.star-btn');
-  function updateStars(rating) { starBtns.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.rating, 10) <= rating)); }
-  starBtns.forEach(btn => {
-    btn.addEventListener('click', () => { selectedRating = parseInt(btn.dataset.rating, 10); updateStars(selectedRating); });
-    btn.addEventListener('mouseenter', () => updateStars(parseInt(btn.dataset.rating, 10)));
-    btn.addEventListener('mouseleave', () => updateStars(selectedRating));
-  });
-  updateStars(selectedRating);
-
-  // ─── Review Form ────────────────────────────────────
-
-  const reviewForm = $('#reviewForm');
-  const reviewStatusEl = $('#reviewStatus');
-  if (reviewForm) {
-    reviewForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      reviewStatusEl.textContent = '';
-      const payload = {
-        name: $('#reviewName').value.trim(),
-        phone: getRawPhone($('#reviewPhone').value),
-        text: $('#reviewText').value.trim(),
-        rating: selectedRating,
-      };
-      try {
-        const res = await fetch('/api/reviews/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const data = await res.json();
-        if (data.success) {
-          reviewStatusEl.innerHTML = `<span style="color:var(--color-success);">${data.message}</span>`;
-          reviewForm.reset(); selectedRating = 5; updateStars(selectedRating);
-        } else {
-          reviewStatusEl.innerHTML = `<span style="color:var(--color-danger);">${data.error}</span>`;
-        }
-      } catch (err) {
-        reviewStatusEl.innerHTML = '<span style="color:var(--color-danger);">Network error. Please try again.</span>';
-      }
-    });
-  }
-
   // ─── Init ───────────────────────────────────────────
 
   initTheme();

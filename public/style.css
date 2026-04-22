@@ -195,6 +195,8 @@ img { max-width: 100%; height: auto; display: block; }
 .faq-question:hover { color: var(--color-primary); }
 .faq-answer { padding: 0 0 var(--space-5) 0; color: var(--color-text-muted); }
 .faq-answer p { line-height: 1.7; }
+.faq-answer ul { margin: 8px 0 12px 20px; list-style: disc; }
+.faq-answer ul li { line-height: 1.7; color: var(--color-text-muted); margin-bottom: 2px; }
 .faq-icon { font-size: 1.5rem; transition: transform 0.2s; flex-shrink: 0; }
 .faq-question[aria-expanded="true"] .faq-icon { transform: rotate(45deg); }
 
@@ -328,8 +330,12 @@ img { max-width: 100%; height: auto; display: block; }
    FOOTER
    ═══════════════════════════════════════════════════════ */
 
-.footer { border-top: 1px solid var(--color-border); padding: 32px 0; text-align: center; }
-.footer p { font-size: 0.85rem; color: var(--color-text-tertiary); }
+.footer { border-top: 1px solid var(--color-border); padding: 40px 0; text-align: center; }
+.footer__inner { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.footer__info { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; margin-bottom: 8px; }
+.footer__info p { font-size: 0.9rem; color: var(--color-text-secondary); }
+.footer__info a { color: var(--color-primary); font-weight: 400; }
+.footer__copy { font-size: 0.85rem; color: var(--color-text-tertiary); }
 
 /* ═══════════════════════════════════════════════════════
    TOAST
