@@ -1,15 +1,10 @@
-let pool;
+const { Pool } = require('pg');
 
-function setPool(createdPool) {
-  pool = createdPool;
-}
-
-function getPool() {
-  if (!pool) {
-    throw new Error('Database pool is not initialised. Call setPool() before use.');
-  }
-  return pool;
-}
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+  family: 4,
+});
 
 /** Map DB row to the shape the client / Telegram code expect */
 function mapAppointmentRow(r) {
@@ -29,9 +24,7 @@ function mapAppointmentRow(r) {
 }
 
 async function init() {
-  const p = getPool();
-
-  await p.query(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS appointments (
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
@@ -46,7 +39,7 @@ async function init() {
     );
   `);
 
-  await p.query(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS reviews (
       id SERIAL PRIMARY KEY,
       reviewer_name TEXT NOT NULL,
@@ -58,7 +51,7 @@ async function init() {
     );
   `);
 
-  await p.query(`
+  await pool.query(`
     CREATE UNIQUE INDEX IF NOT EXISTS idx_appointments_active_slot
       ON appointments ("date", "time")
       WHERE status = 'active';
@@ -66,7 +59,7 @@ async function init() {
 }
 
 async function getBookedSlots(date) {
-  const { rows } = await getPool().query(
+  const { rows } = await pool.query(
     `SELECT "time" AS appointment_time
      FROM appointments
      WHERE "date" = $1 AND status = 'active'`,
@@ -76,7 +69,7 @@ async function getBookedSlots(date) {
 }
 
 async function isSlotTaken(date, time) {
-  const { rows } = await getPool().query(
+  const { rows } = await pool.query(
     `SELECT id FROM appointments
      WHERE "date" = $1 AND "time" = $2 AND status = 'active'`,
     [date, time]
@@ -86,7 +79,7 @@ async function isSlotTaken(date, time) {
 
 async function insertAppointment({ name, phone, date, time, duration, price, comment }) {
   const notes = comment || '';
-  await getPool().query(
+  await pool.query(
     `INSERT INTO appointments
       (name, phone, "date", "time", duration, price, notes, status)
      VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')`,
@@ -95,7 +88,7 @@ async function insertAppointment({ name, phone, date, time, duration, price, com
 }
 
 async function getActiveAppointmentsByPhone(phone, todayISO) {
-  const { rows } = await getPool().query(
+  const { rows } = await pool.query(
     `SELECT id, name, phone, "date", "time", duration, price, notes, status
      FROM appointments
      WHERE phone = $1 AND status = 'active' AND "date" >= $2
@@ -106,7 +99,7 @@ async function getActiveAppointmentsByPhone(phone, todayISO) {
 }
 
 async function cancelAppointmentById(id, phone) {
-  const result = await getPool().query(
+  const result = await pool.query(
     `UPDATE appointments
      SET status = 'cancelled'
      WHERE id = $1 AND phone = $2 AND status = 'active'`,
@@ -116,7 +109,7 @@ async function cancelAppointmentById(id, phone) {
 }
 
 async function getAppointmentById(id) {
-  const { rows } = await getPool().query(
+  const { rows } = await pool.query(
     `SELECT id, name, phone, "date", "time", duration, price, notes, status
      FROM appointments WHERE id = $1`,
     [id]
@@ -125,7 +118,7 @@ async function getAppointmentById(id) {
 }
 
 async function countAppointmentsByPhone(phone) {
-  const { rows } = await getPool().query(
+  const { rows } = await pool.query(
     `SELECT COUNT(*)::int AS cnt
      FROM appointments
      WHERE phone = $1 AND (status = 'active' OR status = 'cancelled')`,
@@ -135,7 +128,7 @@ async function countAppointmentsByPhone(phone) {
 }
 
 async function countReviewsByPhone(phone) {
-  const { rows } = await getPool().query(
+  const { rows } = await pool.query(
     `SELECT COUNT(*)::int AS cnt FROM reviews WHERE reviewer_phone = $1`,
     [phone]
   );
@@ -143,7 +136,7 @@ async function countReviewsByPhone(phone) {
 }
 
 async function insertReview({ name, phone, text, rating }) {
-  await getPool().query(
+  await pool.query(
     `INSERT INTO reviews (reviewer_name, reviewer_phone, review_text, rating)
      VALUES ($1, $2, $3, $4)`,
     [name, phone, text, rating]
@@ -151,14 +144,13 @@ async function insertReview({ name, phone, text, rating }) {
 }
 
 async function getApprovedReviews() {
-  const { rows } = await getPool().query(
+  const { rows } = await pool.query(
     `SELECT * FROM reviews WHERE status = 'approved' ORDER BY created_at DESC`
   );
   return rows;
 }
 
 module.exports = {
-  setPool,
   init,
   getBookedSlots,
   isSlotTaken,

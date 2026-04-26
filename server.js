@@ -1,15 +1,7 @@
 require('dotenv').config();
-const { Pool } = require('pg');
 const express = require('express');
 const path = require('path');
 const db = require('./database');
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
-
-db.setPool(pool);
 
 const app = express();
 app.use(express.json());
