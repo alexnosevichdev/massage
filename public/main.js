@@ -107,16 +107,37 @@
 
   // ─── Mobile menu ────────────────────────────────────
 
-  hamburger.addEventListener('click', () => {
-    const open = hamburger.getAttribute('aria-expanded') === 'true';
-    hamburger.setAttribute('aria-expanded', String(!open));
-    navLinks.classList.toggle('nav__links--open', !open);
+  function setMobileMenuOpen(isOpen) {
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+    hamburger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+    hamburger.classList.toggle('is-active', isOpen);
+    nav.classList.toggle('nav--open', isOpen);
+    navLinks.classList.toggle('nav__links--open', isOpen);
+    document.body.classList.toggle('nav-open', isOpen);
+  }
+
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setMobileMenuOpen(hamburger.getAttribute('aria-expanded') !== 'true');
   });
-  $$('.nav__link').forEach(link => {
+
+  $$('.nav__link').forEach((link) => {
     link.addEventListener('click', () => {
-      hamburger.setAttribute('aria-expanded', 'false');
-      navLinks.classList.remove('nav__links--open');
+      setMobileMenuOpen(false);
     });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!document.body.classList.contains('nav-open')) return;
+    if (!nav.contains(e.target)) {
+      setMobileMenuOpen(false);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('nav-open')) {
+      setMobileMenuOpen(false);
+    }
   });
 
   // ─── Footer year ────────────────────────────────────
@@ -172,8 +193,12 @@
   const MONTHS = ['January','February','March','April','May','June',
                   'July','August','September','October','November','December'];
 
+  function getNowInSanDiego() {
+    return new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  }
+
   function todayISO() {
-    const d = new Date();
+    const d = getNowInSanDiego();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
 
@@ -182,7 +207,7 @@
   }
 
   function getMaxMonth() {
-    const now = new Date();
+    const now = getNowInSanDiego();
     let m = now.getMonth() + 2;
     let y = now.getFullYear();
     if (m > 11) { m -= 12; y++; }
@@ -190,7 +215,7 @@
   }
 
   function initCalendar() {
-    const now = new Date();
+    const now = getNowInSanDiego();
     calYear = now.getFullYear();
     calMonthIdx = now.getMonth();
     renderCalendar();
@@ -198,7 +223,7 @@
 
   function renderCalendar() {
     calMonthLabel.textContent = `${MONTHS[calMonthIdx]} ${calYear}`;
-    const now = new Date();
+    const now = getNowInSanDiego();
     const currentMonth = now.getFullYear() * 12 + now.getMonth();
     const viewMonth = calYear * 12 + calMonthIdx;
     const max = getMaxMonth();
@@ -241,7 +266,7 @@
   }
 
   calPrev.addEventListener('click', () => {
-    const now = new Date();
+    const now = getNowInSanDiego();
     if (calYear * 12 + calMonthIdx <= now.getFullYear() * 12 + now.getMonth()) return;
     calMonthIdx--;
     if (calMonthIdx < 0) { calMonthIdx = 11; calYear--; }

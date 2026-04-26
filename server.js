@@ -17,6 +17,10 @@ const AVAILABLE_DAYS = [3, 5];
 
 // ─── Helpers ────────────────────────────────────────────────
 
+function getNowInSanDiego() {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+}
+
 function isValidDate(str) {
   return /^\d{4}-\d{2}-\d{2}$/.test(str) && !isNaN(Date.parse(str));
 }
@@ -26,16 +30,11 @@ function isAvailableDay(dateStr) {
   return AVAILABLE_DAYS.includes(d.getDay());
 }
 
-function nowMinutes() {
-  const now = new Date();
-  return now.getHours() * 60 + now.getMinutes();
-}
-
 function todayISO() {
-  const d = new Date();
-  return d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0');
+  const nowSD = getNowInSanDiego();
+  return nowSD.getFullYear() + '-' +
+    String(nowSD.getMonth() + 1).padStart(2, '0') + '-' +
+    String(nowSD.getDate()).padStart(2, '0');
 }
 
 async function sendTelegram(text) {
@@ -78,8 +77,9 @@ app.get('/api/slots', (req, res) => {
 
   let slots = [...FIXED_SLOTS];
 
+  const nowSD = getNowInSanDiego();
   if (date === today) {
-    const current = nowMinutes();
+    const current = nowSD.getHours() * 60 + nowSD.getMinutes();
     slots = slots.filter(s => {
       const [h, m] = s.split(':').map(Number);
       return h * 60 + m > current;
@@ -104,8 +104,18 @@ app.post('/api/book', (req, res) => {
   if (!isValidDate(date)) {
     return res.status(400).json({ success: false, error: 'Invalid date format.' });
   }
-  if (date < todayISO()) {
+  const today = todayISO();
+  if (date < today) {
     return res.status(400).json({ success: false, error: 'Cannot book in the past.' });
+  }
+  if (date === today) {
+    const [h, m] = time.split(':').map(Number);
+    const slotMin = h * 60 + m;
+    const nowSD = getNowInSanDiego();
+    const nowMin = nowSD.getHours() * 60 + nowSD.getMinutes();
+    if (slotMin <= nowMin) {
+      return res.status(400).json({ success: false, error: 'This time has already passed.' });
+    }
   }
   if (!isAvailableDay(date)) {
     return res.status(400).json({ success: false, error: 'Sessions are available on Wednesdays and Fridays only.' });
