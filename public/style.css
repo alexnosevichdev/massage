@@ -140,13 +140,6 @@ img { max-width: 100%; height: auto; display: block; }
 .nav__inner { display: flex; align-items: center; justify-content: space-between; }
 .nav__logo { display: flex; align-items: center; flex-shrink: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 1.25rem; color: var(--color-text); }
 .nav__logo:hover { color: var(--color-primary); }
-.hero-logo {
-  width: 180px;
-  height: auto;
-  display: block;
-  margin-bottom: var(--space-6);
-  border-radius: var(--radius-md);
-}
 .nav__links { display: flex; gap: 32px; }
 .nav__link { font-size: 0.9rem; font-weight: 400; color: var(--color-text-secondary); transition: color 0.2s; letter-spacing: 0.01em; }
 .nav__link:hover { color: var(--color-text); }
@@ -172,19 +165,39 @@ body.nav-open { overflow: hidden; }
    HERO
    ═══════════════════════════════════════════════════════ */
 
-.hero { min-height: 100vh; display: flex; align-items: center; padding-top: 80px; }
-.hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding-top: 80px; padding-bottom: 48px; }
+.hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: stretch; min-height: 0; min-width: 0; }
+.hero__text { display: flex; flex-direction: column; align-items: flex-start; text-align: left; min-width: 0; }
 .hero__title { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 12px; }
 .hero__subtitle { font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 400; color: var(--color-primary); margin-bottom: 24px; letter-spacing: 0.02em; }
 .hero__tagline { font-size: 1.1rem; font-weight: 300; color: var(--color-text-secondary); margin-bottom: 40px; max-width: 480px; line-height: 1.8; }
-.hero__photo { border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-lg); aspect-ratio: 4/5; }
+.hero__photo { border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-lg); min-width: 0; }
 .hero__photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.hero-logo {
+  width: 200px;
+  height: auto;
+  display: block;
+  margin-bottom: var(--space-6);
+  border-radius: var(--radius-md);
+}
+
+/* Desktop: one tall row; right column image fills it; left column content vertically centered */
+@media (min-width: 901px) {
+  .hero__inner {
+    min-height: calc(100svh - 80px - 3rem);
+    grid-template-rows: 1fr;
+  }
+  .hero__text { justify-content: center; }
+  .hero__photo { position: relative; min-height: 100%; height: 100%; align-self: stretch; }
+  .hero__photo img { position: absolute; inset: 0; width: 100%; height: 100%; }
+}
 
 /* ═══════════════════════════════════════════════════════
    CTA PRICE NOTE
    ═══════════════════════════════════════════════════════ */
 
 .cta-price-note { font-size: var(--text-sm); color: var(--color-text-muted); text-align: center; margin-top: var(--space-2); letter-spacing: 0.03em; }
+.hero .cta-price-note { text-align: left; }
 
 /* ═══════════════════════════════════════════════════════
    ABOUT
@@ -377,15 +390,19 @@ body.nav-open { overflow: hidden; }
    ═══════════════════════════════════════════════════════ */
 
 @media (max-width: 900px) {
-  .hero__inner { grid-template-columns: 1fr; gap: 40px; }
-  .hero__photo { order: -1; }
-  .hero__photo img { max-height: 500px; margin: 0 auto; }
+  .hero__inner { grid-template-columns: 1fr; grid-template-rows: auto; gap: 40px; min-height: 0; }
+  .hero__text { align-items: center; text-align: center; }
+  .hero__photo { order: -1; min-height: 0; height: auto; align-self: stretch; }
+  .hero__photo img { position: static; display: block; width: 100%; height: auto; max-height: 70vh; object-fit: cover; }
+  .hero .cta-price-note { text-align: center; }
+  .hero-logo { margin-left: auto; margin-right: auto; }
   .about__inner { grid-template-columns: 1fr; gap: 40px; }
   .booking__layout { grid-template-columns: 1fr; gap: 32px; }
   .reviews-carousel { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
+  .hero-logo { width: 160px; margin-left: auto; margin-right: auto; }
   .cta-photo-inner { grid-template-columns: 1fr; gap: var(--space-8); padding-inline: var(--space-4); }
   .cta-photo-right { order: -1; }
   .cta-natural-photo { max-width: 100%; border-radius: var(--radius-lg); }
