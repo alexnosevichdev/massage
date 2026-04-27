@@ -9,7 +9,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
 const TG_TOKEN = process.env.TG_TOKEN;
-const TG_CHAT_ID = process.env.TG_CHAT_ID;
 
 const FIXED_SLOTS = ['08:00', '09:30', '11:00', '12:30', '14:00', '15:30', '17:00', '18:30', '19:30'];
 const LATE_SLOTS = ['18:30', '19:30'];
@@ -38,20 +37,17 @@ function todayISO() {
 }
 
 async function sendTelegram(text) {
-  if (!TG_TOKEN || !TG_CHAT_ID) return;
-  try {
-    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TG_CHAT_ID,
-        text,
-        parse_mode: 'HTML',
-      }),
-    });
-  } catch (err) {
-    console.error('Telegram send failed:', err.message);
-  }
+  if (!TG_TOKEN) return;
+  const ids = [process.env.TG_CHAT_ID, process.env.TG_CHAT_ID_2].filter(Boolean);
+  await Promise.all(
+    ids.map((id) =>
+      fetch(`https://api.telegram.org/bot${process.env.TG_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: id, text, parse_mode: 'HTML' }),
+      })
+    )
+  );
 }
 
 // ─── Routes ─────────────────────────────────────────────────
