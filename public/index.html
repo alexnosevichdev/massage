@@ -4,14 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TuchkovMassage | Therapy by Andrei Tuchkov</title>
-  <meta name="description" content="Therapeutic massage in La Mesa, San Diego. Personalised bodywork for pain relief, recovery and well-being. 15+ years of experience. Book online.">
+  <meta name="description" content="Therapeutic massage in La Mesa, CA by Andrei Tuchkov. 15+ years of experience. Deep tissue, recovery & bodywork. Book online — 60 min $140, 90 min $200.">
+  <meta name="keywords" content="massage La Mesa CA, therapeutic massage San Diego, deep tissue massage, Andrei Tuchkov massage, recovery massage bodywork">
+  <meta name="author" content="Andrei Tuchkov">
+  <meta name="robots" content="index, follow">
   <meta property="og:title" content="TuchkovMassage | Therapy by Andrei Tuchkov">
-  <meta property="og:description" content="Therapeutic massage in La Mesa, San Diego. Personalised bodywork for pain relief, recovery and well-being. 15+ years of experience. Book online.">
-  <meta property="og:url" content="https://massage-nh7l.onrender.com">
+  <meta property="og:description" content="Therapeutic massage in La Mesa, CA. 15+ years of experience. Book online.">
+  <meta property="og:image" content="https://tuchkovmassage.com/assets/andrey-main.jpg">
+  <meta property="og:url" content="https://tuchkovmassage.com">
   <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="TuchkovMassage | Therapy by Andrei Tuchkov">
-  <meta name="twitter:description" content="Therapeutic massage in La Mesa, San Diego. 15+ years of experience. Book online.">
+  <meta name="twitter:description" content="Therapeutic massage in La Mesa, CA. Book online.">
+  <meta name="twitter:image" content="https://tuchkovmassage.com/assets/andrey-main.jpg">
+  <link rel="canonical" href="https://tuchkovmassage.com">
+  <link rel="icon" type="image/jpeg" href="./assets/logo-tuchkov.jpg">
+  <link rel="apple-touch-icon" href="./assets/logo-tuchkov.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -22,13 +31,14 @@
   <!-- ─── NAV ──────────────────────────────────────────── -->
   <header class="nav" id="nav">
     <div class="nav__inner container">
-      <a href="#hero" class="nav__logo" aria-label="Home">Cloud Touch Massage</a>
+      <a href="#hero" class="nav__logo" aria-label="Home">Tuchkov Massage</a>
 
       <nav class="nav__links" id="navLinks">
         <a href="#hero" class="nav__link">Home</a>
         <a href="#about" class="nav__link">About</a>
         <a href="#booking" class="nav__link">Book</a>
         <a href="#faq" class="nav__link">FAQ</a>
+        <a href="#directions" class="nav__link">Directions</a>
         <a href="#reviews" class="nav__link">Reviews</a>
         <a href="#cancel" class="nav__link">Cancel</a>
       </nav>
@@ -207,6 +217,37 @@
       </div>
     </section>
 
+    <!-- ─── DIRECTIONS ───────────────────────────────────── -->
+    <section id="directions" class="section directions-section">
+      <div class="container">
+        <div class="directions__grid">
+          <div class="directions__text">
+            <h2 class="section__title directions__heading">How to Find Us</h2>
+            <p class="directions__address">7811 LaMesa Blvd Suite D, La Mesa, CA 91942</p>
+            <p class="directions__blurb">We're located on LaMesa Blvd, easily accessible by car. Parking is available on the street and in nearby lots — in most cases you'll find a spot within a minute.</p>
+            <a href="https://maps.google.com/?q=7811+LaMesa+Blvd+Suite+D+La+Mesa+CA+91942"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="directions__maps-link">
+              Open in Google Maps →
+            </a>
+          </div>
+          <div class="directions__map">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3353.4!2d-117.0230!3d32.7680!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80d9534b9e0a7e1f%3A0x1234!2s7811+LaMesa+Blvd+Suite+D%2C+La+Mesa%2C+CA+91942!5e0!3m2!1sen!2sus!4v1"
+              width="100%"
+              height="380"
+              style="border:0; border-radius: 12px;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Location map">
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ─── REVIEWS ──────────────────────────────────────── -->
     <section id="reviews" class="section">
       <div class="container">
@@ -249,7 +290,7 @@
         <p><a href="https://wa.me/16195987253" target="_blank" rel="noopener noreferrer">+1 (619) 598-7253</a></p>
         <p><a href="https://www.instagram.com/massage_andree" target="_blank" rel="noopener noreferrer">Instagram: @massage_andree</a></p>
       </div>
-      <p class="footer__copy">&copy; <span id="currentYear"></span> Cloud Touch Massage. All rights reserved.</p>
+      <p class="footer__copy">&copy; <span id="currentYear"></span> Tuchkov Massage. All rights reserved.</p>
     </div>
   </footer>
 
@@ -257,17 +298,32 @@
 
   <!-- ─── MODAL: Booking Confirmation ──────────────────── -->
   <div class="modal-overlay" id="confirmModal" hidden>
-    <div class="modal">
+    <div class="modal modal--confirmation">
       <button class="modal__close" id="modalClose" aria-label="Close">&times;</button>
-      <div class="modal__icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <div class="modal__icon modal__icon--success" aria-hidden="true">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       </div>
-      <h3 class="modal__title">Booking Confirmed!</h3>
-      <p class="modal__text" id="modalText"></p>
+      <h3 class="modal__title modal__title--success">You're booked!</h3>
+      <p class="modal__subtext">Your session is confirmed. See you soon.</p>
+      <div class="confirm-details" id="confirmDetails"></div>
       <p class="modal__hint">To cancel, visit the <a href="#cancel">Cancel section</a> and enter your phone number.</p>
-      <button class="btn btn--primary modal__done" id="modalDone">Done</button>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--primary modal__cta" id="modalAddCalendar">Add to Calendar</button>
+        <button type="button" class="btn btn--outline modal__cta" id="modalBackHome">Back to Home</button>
+      </div>
     </div>
   </div>
+
+  <a href="https://wa.me/16195987253"
+     target="_blank"
+     rel="noopener noreferrer"
+     class="whatsapp-float"
+     aria-label="Contact on WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.554 4.118 1.528 5.855L.057 23.882l6.187-1.443A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.002-1.368l-.36-.214-3.722.868.936-3.62-.235-.372A9.795 9.795 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/>
+    </svg>
+  </a>
 
   <script src="./main.js"></script>
 </body>

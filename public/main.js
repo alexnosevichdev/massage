@@ -26,9 +26,10 @@
   const bookingStatus = $('#bookingStatus');
   const toast = $('#toast');
   const confirmModal = $('#confirmModal');
-  const modalText = $('#modalText');
+  const confirmDetails = $('#confirmDetails');
   const modalClose = $('#modalClose');
-  const modalDone = $('#modalDone');
+  const modalAddCalendar = $('#modalAddCalendar');
+  const modalBackHome = $('#modalBackHome');
 
   const bookDate = $('#bookDate');
   const bookTime = $('#bookTime');
@@ -417,21 +418,123 @@
     bookSubmit.disabled = false;
   });
 
-  // ─── Confirmation modal ─────────────────────────────
+  // ─── Confirmation modal & calendar (.ics) ───────────
+
+  let lastConfirmedBooking = null;
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
+  function icsEscapeText(val) {
+    return String(val)
+      .replace(/\\/g, '\\\\')
+      .replace(/\n/g, '\\n')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,');
+  }
+
+  function pad2(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  function utcStampNow() {
+    const d = new Date();
+    return (
+      d.getUTCFullYear() +
+      pad2(d.getUTCMonth() + 1) +
+      pad2(d.getUTCDate()) +
+      'T' +
+      pad2(d.getUTCHours()) +
+      pad2(d.getUTCMinutes()) +
+      pad2(d.getUTCSeconds()) +
+      'Z'
+    );
+  }
+
+  function downloadIcs(booking) {
+    const durMin = booking.duration === 90 ? 90 : 60;
+    const dtStartLocal =
+      booking.date.replace(/-/g, '') +
+      'T' +
+      (function () {
+        const parts = booking.time.split(':');
+        const h = parseInt(parts[0], 10);
+        const m = parseInt(parts[1] || '0', 10);
+        return pad2(h) + pad2(m) + '00';
+      })();
+    const uid =
+      'tuchkov-' +
+      booking.date +
+      '-' +
+      booking.time.replace(/:/g, '') +
+      '-' +
+      Math.random().toString(36).slice(2, 10) +
+      '@tuchkovmassage.com';
+
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Tuchkov Massage//EN',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      'UID:' + uid,
+      'DTSTAMP:' + utcStampNow(),
+      'DTSTART;TZID=America/Los_Angeles:' + dtStartLocal,
+      'DURATION:PT' + durMin + 'M',
+      'SUMMARY:' + icsEscapeText('Massage Session with Andrei Tuchkov'),
+      'LOCATION:' + icsEscapeText('7811 LaMesa Blvd Suite D, La Mesa, CA 91942'),
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ];
+    const icsBody = lines.join('\r\n') + '\r\n';
+    const blob = new Blob([icsBody], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'massage-session-tuchkov.ics';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
 
   function showConfirmModal(booking) {
+    lastConfirmedBooking = booking;
     const d = new Date(booking.date + 'T00:00:00');
     const formatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
     const dur = booking.duration || 60;
     const price = dur === 90 ? 200 : 140;
-    modalText.textContent = `${dur} min session ($${price}) on ${formatted} at ${booking.time}.`;
+    confirmDetails.innerHTML =
+      '<dl>' +
+      '<dt>Name</dt><dd>' + escapeHtml(booking.name) + '</dd>' +
+      '<dt>Date</dt><dd>' + escapeHtml(formatted) + '</dd>' +
+      '<dt>Time</dt><dd>' + escapeHtml(booking.time) + '</dd>' +
+      '<dt>Duration</dt><dd>' + escapeHtml(String(dur)) + ' minutes</dd>' +
+      '<dt>Price</dt><dd>$' + price + '</dd>' +
+      '</dl>';
     confirmModal.hidden = false;
   }
 
-  function closeModal() { confirmModal.hidden = true; }
+  function closeModal() {
+    confirmModal.hidden = true;
+  }
+
   modalClose.addEventListener('click', closeModal);
-  modalDone.addEventListener('click', closeModal);
-  confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) closeModal(); });
+  modalAddCalendar.addEventListener('click', () => {
+    if (lastConfirmedBooking) downloadIcs(lastConfirmedBooking);
+  });
+  modalBackHome.addEventListener('click', () => {
+    closeModal();
+    const heroEl = document.getElementById('hero');
+    if (heroEl) heroEl.scrollIntoView({ behavior: 'smooth' });
+  });
+  confirmModal.addEventListener('click', (e) => {
+    if (e.target === confirmModal) closeModal();
+  });
 
   // ─── Cancel section (phone-based) ──────────────────
 
@@ -587,5 +690,22 @@
   initTheme();
   initCalendar();
   loadReviews();
+
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12 }
+  );
+
+  document.querySelectorAll('section, .card, .faq-item').forEach((el) => {
+    el.classList.add('reveal');
+    revealObserver.observe(el);
+  });
 
 })();
