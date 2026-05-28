@@ -183,6 +183,19 @@ body.nav-open { overflow: hidden; }
   min-width: 0;
 }
 
+.hero--centered {
+  grid-template-columns: 1fr !important;
+  justify-items: center;
+  padding-top: calc(80px + var(--space-12));
+  padding-bottom: var(--space-12);
+}
+
+.hero__left--centered {
+  align-items: center;
+  text-align: center;
+  max-width: 760px;
+}
+
 .hero__photo {
   min-width: 0;
   width: 100%;
@@ -206,6 +219,11 @@ body.nav-open { overflow: hidden; }
   align-items: flex-start;
   text-align: left;
   min-width: 0;
+}
+
+.hero__copy--centered {
+  align-items: center;
+  text-align: center;
 }
 
 .hero__title { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 12px; }
