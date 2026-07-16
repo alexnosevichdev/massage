@@ -4,8 +4,6 @@
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
 
-  const LATE_SLOTS = ['18:30', '19:30'];
-
   const nav = $('#nav');
   const hamburger = $('#hamburger');
   const navLinks = $('#navLinks');
@@ -17,7 +15,6 @@
   const timeslotsGrid = $('#timeslotsGrid');
   const timeslotsEmpty = $('#timeslotsEmpty');
   const timeslotsUnavailable = $('#timeslotsUnavailable');
-  const timeslotsDurationWarn = $('#timeslotsDurationWarn');
   const bookingForm = $('#bookingForm');
   const bookSubmit = $('#bookSubmit');
   const bookingSummary = $('#bookingSummary');
@@ -36,11 +33,13 @@
 
   // ─── State ──────────────────────────────────────────
 
+  // All sessions are 90 minutes for $180.
+  const SESSION_DURATION = 90;
+  const SESSION_PRICE = 180;
+
   let calYear, calMonthIdx;
   let selectedDate = null;
   let selectedTime = null;
-  let selectedDuration = 60;
-  let selectedPrice = 140;
 
   // ─── Phone Formatting ──────────────────────────────
 
@@ -157,38 +156,6 @@
     toastTimer = setTimeout(() => toast.classList.remove('toast--visible'), 4000);
   }
 
-  // ─── Duration Toggle ───────────────────────────────
-
-  function applyDurationRestrictions() {
-    timeslotsDurationWarn.hidden = true;
-    $$('.timeslot').forEach(btn => {
-      const slotTime = btn.textContent;
-      if (selectedDuration === 90 && LATE_SLOTS.includes(slotTime)) {
-        btn.classList.add('disabled-duration');
-        btn.classList.remove('timeslot--selected');
-        if (selectedTime === slotTime) {
-          selectedTime = null;
-          bookTime.value = '';
-          timeslotsDurationWarn.hidden = false;
-          updateSummary();
-        }
-      } else if (!btn.disabled) {
-        btn.classList.remove('disabled-duration');
-      }
-    });
-  }
-
-  $$('.duration-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      $$('.duration-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedDuration = parseInt(btn.dataset.duration, 10);
-      selectedPrice = parseInt(btn.dataset.price, 10);
-      applyDurationRestrictions();
-      validateForm();
-    });
-  });
-
   // ─── Custom Calendar ───────────────────────────────
 
   const MONTHS = ['January','February','March','April','May','June',
@@ -248,18 +215,18 @@
       const dayDate = new Date(calYear, calMonthIdx, d);
       const dayOfWeek = dayDate.getDay();
       const isPast = iso < today;
-      const isWedOrFri = dayOfWeek === 3 || dayOfWeek === 5;
+      const isWorkday = dayOfWeek >= 1 && dayOfWeek <= 5;
 
       const el = document.createElement('button');
       el.type = 'button';
       el.textContent = d;
       let cls = 'cal-day';
       if (isPast) { cls += ' past'; }
-      else if (isWedOrFri) { cls += ' available'; }
-      if (iso === today && isWedOrFri && !isPast) { cls += ' today'; }
+      else if (isWorkday) { cls += ' available'; }
+      if (iso === today && isWorkday && !isPast) { cls += ' today'; }
       if (iso === selectedDate) { cls += ' selected'; }
       el.className = cls;
-      if (!isPast && isWedOrFri) {
+      if (!isPast && isWorkday) {
         el.addEventListener('click', () => selectDate(iso));
       }
       calDays.appendChild(el);
@@ -293,7 +260,6 @@
     timeslotsGrid.innerHTML = '<span class="timeslots__label" style="text-align:center;padding:12px;">Loading…</span>';
     timeslotsEmpty.hidden = true;
     timeslotsUnavailable.hidden = true;
-    timeslotsDurationWarn.hidden = true;
 
     try {
       const res = await fetch(`/api/slots?date=${iso}`);
@@ -324,7 +290,6 @@
         }
         timeslotsGrid.appendChild(btn);
       });
-      applyDurationRestrictions();
       if (available.length === 0) {
         timeslotsEmpty.textContent = 'All slots are booked for this date.';
         timeslotsEmpty.hidden = false;
@@ -337,13 +302,11 @@
   }
 
   function selectTime(time) {
-    if (selectedDuration === 90 && LATE_SLOTS.includes(time)) return;
     selectedTime = time;
     bookTime.value = time;
-    timeslotsDurationWarn.hidden = true;
     updateSummary();
     $$('.timeslot').forEach(btn => {
-      btn.classList.toggle('timeslot--selected', btn.textContent === time && !btn.classList.contains('disabled-duration'));
+      btn.classList.toggle('timeslot--selected', btn.textContent === time);
     });
   }
 
@@ -384,7 +347,7 @@
       phone: getRawPhone($('#bookPhone').value),
       date: bookDate.value,
       time: bookTime.value,
-      duration: selectedDuration,
+      duration: SESSION_DURATION,
       comment: $('#bookComment').value.trim(),
     };
     try {
@@ -403,10 +366,6 @@
         bookTime.value = '';
         bookingSummary.hidden = true;
         timeslotsGrid.innerHTML = '';
-        timeslotsDurationWarn.hidden = true;
-        selectedDuration = 60;
-        selectedPrice = 140;
-        $$('.duration-btn').forEach(b => b.classList.toggle('active', b.dataset.duration === '60'));
         renderCalendar();
       } else {
         showToast(data.error || 'Booking failed.', true);
@@ -455,7 +414,7 @@
   }
 
   function downloadIcs(booking) {
-    const durMin = booking.duration === 90 ? 90 : 60;
+    const durMin = SESSION_DURATION;
     const dtStartLocal =
       booking.date.replace(/-/g, '') +
       'T' +
@@ -506,8 +465,8 @@
     lastConfirmedBooking = booking;
     const d = new Date(booking.date + 'T00:00:00');
     const formatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    const dur = booking.duration || 60;
-    const price = dur === 90 ? 200 : 140;
+    const dur = SESSION_DURATION;
+    const price = SESSION_PRICE;
     confirmDetails.innerHTML =
       '<dl>' +
       '<dt>Name</dt><dd>' + escapeHtml(booking.name) + '</dd>' +

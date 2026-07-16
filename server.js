@@ -10,9 +10,28 @@ app.use(express.static(path.join(__dirname, 'public')));
 const PORT = process.env.PORT || 3000;
 const TG_TOKEN = process.env.TG_TOKEN;
 
-const FIXED_SLOTS = ['08:00', '09:30', '11:00', '12:30', '14:00', '15:30', '17:00', '18:30', '19:30'];
-const LATE_SLOTS = ['18:30', '19:30'];
-const AVAILABLE_DAYS = [3, 5];
+// All sessions are 90 minutes for $180.
+const SESSION_DURATION = 90;
+const SESSION_PRICE = 180;
+
+// 90-minute start times. Last regular slot 17:00 ends at 18:30.
+const FIXED_SLOTS = ['08:00', '09:30', '11:00', '12:30', '14:00', '15:30', '17:00'];
+
+// Available days: Monday–Friday (Saturday & Sunday are days off).
+const AVAILABLE_DAYS = [1, 2, 3, 4, 5];
+
+// On Tuesdays the working day ends at 17:00, so the last 90-min session
+// must finish by then — latest start is 15:30.
+const TUESDAY = 2;
+const TUESDAY_LAST_SLOT = '15:30';
+
+function getSlotsForDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  if (d.getDay() === TUESDAY) {
+    return FIXED_SLOTS.filter((s) => s <= TUESDAY_LAST_SLOT);
+  }
+  return [...FIXED_SLOTS];
+}
 
 // ─── Helpers ────────────────────────────────────────────────
 
@@ -72,7 +91,7 @@ app.get('/api/slots', async (req, res) => {
       return res.json({ slots: [], booked: [], unavailable: true });
     }
 
-    let slots = [...FIXED_SLOTS];
+    let slots = getSlotsForDate(date);
 
     const nowSD = getNowInSanDiego();
     if (date === today) {
@@ -95,9 +114,8 @@ app.get('/api/slots', async (req, res) => {
 app.post('/api/book', async (req, res) => {
   try {
     const { name, phone, date, time, comment } = req.body;
-    const clientDuration = parseInt(req.body.duration, 10);
-    const duration = clientDuration === 90 ? 90 : 60;
-    const price = duration === 90 ? 200 : 140;
+    const duration = SESSION_DURATION;
+    const price = SESSION_PRICE;
     const service = `${duration} min session — $${price}`;
 
     if (!name || !phone || !date || !time) {
@@ -120,13 +138,10 @@ app.post('/api/book', async (req, res) => {
       }
     }
     if (!isAvailableDay(date)) {
-      return res.status(400).json({ success: false, error: 'Sessions are available on Wednesdays and Fridays only.' });
+      return res.status(400).json({ success: false, error: 'Sessions are available Monday through Friday only.' });
     }
-    if (!FIXED_SLOTS.includes(time)) {
+    if (!getSlotsForDate(date).includes(time)) {
       return res.status(400).json({ success: false, error: 'Invalid time slot.' });
-    }
-    if (duration === 90 && LATE_SLOTS.includes(time)) {
-      return res.status(400).json({ success: false, error: '90-min sessions cannot be booked at 18:30 or 19:30.' });
     }
     if (await db.isSlotTaken(date, time)) {
       return res.status(409).json({ success: false, error: 'This slot was just taken. Please choose another time.' });
