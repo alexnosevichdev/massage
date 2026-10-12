@@ -10,18 +10,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 const PORT = process.env.PORT || 3000;
 const TG_TOKEN = process.env.TG_TOKEN;
 
-// All sessions are 90 minutes for $180.
-const SESSION_DURATION = 90;
-const SESSION_PRICE = 180;
+// Available session lengths: minutes -> price in USD (price is always taken from here, never from the client).
+const PRICES = { 30: 60, 60: 120, 90: 180 };
+const DEFAULT_DURATION = 90;
 
-// 90-minute start times. Last regular slot 17:00 ends at 18:30.
+// Start times (spaced for the longest, 90-minute session). Last regular slot 17:00 ends at 18:30 for 90 min.
 const FIXED_SLOTS = ['08:00', '09:30', '11:00', '12:30', '14:00', '15:30', '17:00'];
 
 // Available days: Monday–Friday (Saturday & Sunday are days off).
 const AVAILABLE_DAYS = [1, 2, 3, 4, 5];
 
-// On Tuesdays the working day ends at 17:00, so the last 90-min session
-// must finish by then — latest start is 15:30.
+// On Tuesdays the working day ends at 17:00, so the last session
+// must finish by then — latest start is 15:30 for all durations.
 const TUESDAY = 2;
 const TUESDAY_LAST_SLOT = '15:30';
 
@@ -114,8 +114,9 @@ app.get('/api/slots', async (req, res) => {
 app.post('/api/book', async (req, res) => {
   try {
     const { name, phone, date, time, comment } = req.body;
-    const duration = SESSION_DURATION;
-    const price = SESSION_PRICE;
+    const clientDuration = parseInt(req.body.duration, 10);
+    const duration = PRICES[clientDuration] ? clientDuration : DEFAULT_DURATION;
+    const price = PRICES[duration];
     const service = `${duration} min session — $${price}`;
 
     if (!name || !phone || !date || !time) {
