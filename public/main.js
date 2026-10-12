@@ -33,13 +33,14 @@
 
   // ─── State ──────────────────────────────────────────
 
-  // All sessions are 90 minutes for $180.
-  const SESSION_DURATION = 90;
-  const SESSION_PRICE = 180;
+  // Available session lengths (minutes -> price in USD). Server keeps the same table.
+  const PRICES = { 30: 60, 60: 120, 90: 180 };
+  const DEFAULT_DURATION = 90;
 
   let calYear, calMonthIdx;
   let selectedDate = null;
   let selectedTime = null;
+  let selectedDuration = DEFAULT_DURATION;
 
   // ─── Phone Formatting ──────────────────────────────
 
@@ -155,6 +156,24 @@
     toast.classList.add('toast--visible');
     toastTimer = setTimeout(() => toast.classList.remove('toast--visible'), 4000);
   }
+
+  // ─── Duration Toggle ───────────────────────────────
+
+  $$('.duration-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.duration-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedDuration = parseInt(btn.dataset.duration, 10);
+    });
+  });
+
+  // Buttons elsewhere on the page can pre-select a session length (e.g. Signature Body Therapy = 90 min).
+  $$('[data-pick-duration]').forEach(link => {
+    link.addEventListener('click', () => {
+      const btn = $(`.duration-btn[data-duration="${link.dataset.pickDuration}"]`);
+      if (btn) btn.click();
+    });
+  });
 
   // ─── Custom Calendar ───────────────────────────────
 
@@ -347,7 +366,7 @@
       phone: getRawPhone($('#bookPhone').value),
       date: bookDate.value,
       time: bookTime.value,
-      duration: SESSION_DURATION,
+      duration: selectedDuration,
       comment: $('#bookComment').value.trim(),
     };
     try {
@@ -366,6 +385,8 @@
         bookTime.value = '';
         bookingSummary.hidden = true;
         timeslotsGrid.innerHTML = '';
+        selectedDuration = DEFAULT_DURATION;
+        $$('.duration-btn').forEach(b => b.classList.toggle('active', b.dataset.duration === String(DEFAULT_DURATION)));
         renderCalendar();
       } else {
         showToast(data.error || 'Booking failed.', true);
@@ -414,7 +435,7 @@
   }
 
   function downloadIcs(booking) {
-    const durMin = SESSION_DURATION;
+    const durMin = PRICES[booking.duration] ? booking.duration : DEFAULT_DURATION;
     const dtStartLocal =
       booking.date.replace(/-/g, '') +
       'T' +
@@ -465,8 +486,8 @@
     lastConfirmedBooking = booking;
     const d = new Date(booking.date + 'T00:00:00');
     const formatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    const dur = SESSION_DURATION;
-    const price = SESSION_PRICE;
+    const dur = PRICES[booking.duration] ? booking.duration : DEFAULT_DURATION;
+    const price = PRICES[dur];
     confirmDetails.innerHTML =
       '<dl>' +
       '<dt>Name</dt><dd>' + escapeHtml(booking.name) + '</dd>' +
