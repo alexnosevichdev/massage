@@ -649,3 +649,6 @@ body.nav-open { overflow: hidden; }
   .reviews-carousel { grid-template-columns: 1fr; }
   .duration-toggle { flex-direction: column; }
 }
+
+/* Reviews: link to Instagram */
+.reviews-more { text-align: center; margin-top: 24px; }
